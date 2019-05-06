@@ -1,5 +1,5 @@
 ## Parallel scheme for empirical bayes
 
-## application to large scRNA data (millions of cells)
+## Application to large scRNA data (millions of cells)
 
 

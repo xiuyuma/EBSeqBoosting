@@ -1,13 +1,10 @@
 #pragma once
 
-#include <Rcpp.h>
-#include <RcppEigen.h>
-#include <vector>
-#include <algorithm>
+#include<vector>
 
-std::vector<std::vector<int> > partition(const int& n)
+
+std::vector<std::vector<int> > monoPart(const int& n)
 {
-
     std::vector<std::vector<int> > start(1);
     start[0].push_back(1);
     if(n==1){
@@ -31,18 +28,4 @@ std::vector<std::vector<int> > partition(const int& n)
         start=new_p;
     }
     return start;
-}
-
-Rcpp::List pat(int K);
-RcppExport SEXP pat(SEXP K)
-{
-    BEGIN_RCPP
-    int k=as<int>(K);
-    std::vector<std::vector<int> > res=partition(k);
-    Eigen::MatrixXi res_m(res.size(),k);
-    for(int i=0;i<res.size();i++)
-        for(int j=0;j<k;j++)
-            res_m(i,j) = res[i][j];
-    return List::create(Named("part") = res_m);
-    END_RCPP
 }

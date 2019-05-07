@@ -15,7 +15,7 @@ std::vector<std::vector<int> > partition(const int& n){
         std::vector<std::vector<int> > new_p;
         size_t L = start.size();
         for(int j = 0;j < L; ++j){
-            int M = *max_element(start[j].begin(),start[j].end());
+            int M = *std::max_element(start[j].begin(),start[j].end());
             for(int k = 0;k < M; ++k){
                 start[j].push_back(k+1);
                 new_p.push_back(start[j]);

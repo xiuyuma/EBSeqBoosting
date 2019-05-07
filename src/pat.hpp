@@ -10,11 +10,11 @@ std::vector<std::vector<int> > partition(const int& n)
 
     std::vector<std::vector<int> > start(1);
     start[0].push_back(1);
-    if(n==1){
+    if(n == 1){
         return start;
     }
     
-    for(int i=1;i<n;++i){
+    for(int i = 1;i < n; ++i){
         std::vector<std::vector<int> > new_p;
         size_t L = start.size();
         for(int j = 0;j < L; ++j){
@@ -28,7 +28,7 @@ std::vector<std::vector<int> > partition(const int& n)
             new_p.push_back(start[j]);
             start[j].pop_back();
         }
-        start=new_p;
+        start = new_p;
     }
     return start;
 }

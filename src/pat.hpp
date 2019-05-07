@@ -1,20 +1,22 @@
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <vector>
+#include <algorithm>
 
 std::vector<std::vector<int> > partition(const int& n){
-    vector<vector<int> > start(1);
+
+    std::vector<std::vector<int> > start(1);
     start[0].push_back(1);
     if(n==1){
         return start;
     }
     
     for(int i=1;i<n;++i){
-        vector<V> new_p;
-        size_t L=start.size();
-        for(int j=0;j<L;++j){
-            int M=*max_element(start[j].begin(),start[j].end());
-            for(int k=0;k<M;++k){
+        std::vector<std::vector<int> > new_p;
+        size_t L = start.size();
+        for(int j = 0;j < L; ++j){
+            int M = *max_element(start[j].begin(),start[j].end());
+            for(int k = 0;k < M; ++k){
                 start[j].push_back(k+1);
                 new_p.push_back(start[j]);
                 start[j].pop_back();

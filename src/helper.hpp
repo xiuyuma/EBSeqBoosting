@@ -42,9 +42,12 @@ struct helper
         
         return true;
     }
+    
+    static vector<int> clusSize(std::vector<int> clus)
+    {
+        
+    }
 };
 
-Eigen::Matrixi aggr(Eigen::Matrixi counts, vector<int> clus)
-{
-    
-}
+
+

@@ -42,7 +42,7 @@ struct helper
         
         return true;
     }
-}
+};
 
 Eigen::Matrixi aggr(Eigen::Matrixi counts, vector<int> clus)
 {

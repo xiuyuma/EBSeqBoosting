@@ -41,7 +41,7 @@ namespace EBS
         {
             size_t G = counts.rows();
             
-            Float LL;
+            Float LL = 0;
             
             for(size_t i = 0; i < G; i++)
             {

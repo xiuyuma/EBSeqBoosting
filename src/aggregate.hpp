@@ -7,15 +7,15 @@
 
 struct aggregate
 {
-    using COUNTS = Eigen::MatrixXi;
+    using COUNTS = Eigen::MatrixXf;
     
-    static COUNTS aggregate(COUNTS& counts, CLUSINFO& clusInfo)
+    static COUNTS sum(COUNTS& counts, CLUSINFO& clusInfo)
     {
-        int K = clusInfo.size.size();
+        size_t K = clusInfo.size.size();
         
         COUNTS res(counts.rows(),K);
         
-        for(int i = 0; i < K; i++)
+        for(auto i = 0; i < K; i++)
         {
             for(auto s:clusInfo.index[i])
             {
@@ -26,15 +26,15 @@ struct aggregate
         return res;
     }
     
-    static Eigen::MatrixXd groupMean(COUNTS& counts, CLUSINFO& clusInfo)
+    static COUNTS groupMean(COUNTS& counts, CLUSINFO& clusInfo)
     {
-        int K = clusInfo.size.size();
+        size_t K = clusInfo.size.size();
         
-        Eigen::MatrixXd _sum = aggregate(counts, clusInfo);
+        COUNTS _sum = sum(counts, clusInfo);
         
-        for(int i = 0; i < K; i++)
+        for(auto i = 0; i < K; i++)
         {
-            int _size = clusInfo.index[i].size();
+            size_t _size = clusInfo.index[i].size();
             
             _sum.col(i) /= _size;
         }
@@ -42,22 +42,28 @@ struct aggregate
         return _sum;
     }
     
-    static Eigen::MatrixXd groupVar(COUNTS& counts, CLUSINFO& clusInfo)
+    template <typename VAL>
+    static VAL square(VAL x)
     {
-        int K = clusInfo.size.size();
+        return x * x;
+    }
+    
+    static COUNTS groupVar(COUNTS& counts, CLUSINFO& clusInfo)
+    {
+        size_t K = clusInfo.size.size();
         
-        Eigen::MatrixXd _mean = groupMean(counts, clusInfo);
+        COUNTS _mean = groupMean(counts, clusInfo);
         
-        Eigen::MatrixXd res(counts.rows(),K);
+        COUNTS res(counts.rows(),K);
         
         for(int i = 0; i < K; i++)
         {
             for(auto s:clusInfo.index[i])
             {
-                res.col(i) += (counts.col(s) - _mean.col(i)).unaryExpr(&[](double a){return a * a;});
+                res.col(i) += (counts.col(s) - _mean.col(i)).unaryExpr(&square<float>);
             }
             
-            res.col(i) /= clusInfo.index.[i].size();
+            res.col(i) /= clusInfo.index[i].size();
         }
         
         return res;

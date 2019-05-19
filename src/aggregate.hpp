@@ -20,6 +20,8 @@ struct aggregate
         
         COUNTS res(counts.rows(),K);
         
+        res.fill(0);
+        
         for(auto i = 0; i < K; i++)
         {
             for(auto s:clusInfo.index[i])
@@ -60,6 +62,8 @@ struct aggregate
         COUNTS _mean = groupMean(counts, clusInfo);
 
         COUNTS res(counts.rows(),K);
+        
+        res.fill(0);
 
         for(int i = 0; i < K; i++)
         {

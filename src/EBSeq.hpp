@@ -8,26 +8,26 @@ namespace EBS
     
     class EBSeq
     {
-
+        
     public:
         //on log scale
-        virtual Float kernel(VEC geneCounts, std::vector<Float> hyperParam)
+        virtual Float kernel(COUNTS& _sum, std::vector<Float>& hyperParam)
         {
             return 0;
         }
         
-        virtual VEC kernelDerivative(COUNTS counts, std::vector<Float> hyperParam)
+        virtual std::vector<Float> kernelDerivative(COUNTS& _sum, std::vector<Float>& hyperParam)
         {
-            return VEC();
+            return std::vector<Float>();
         }
         
-        void gradientAscent(COUNTS counts, std::vector<Float> hyperParam, std::vector<Float> lrate)
+        void gradientAscent(COUNTS& _sum, std::vector<Float>& hyperParam, std::vector<Float>& lrate)
         {
             size_t _n = hyperParam.size();
             
             assert(lrate.size() == _n);
             
-            VEC drv = kernelDerivative(counts, hyperParam);
+            std::vector<Float> drv = kernelDerivative(_sum, hyperParam);
             
             for(size_t i = 0; i < _n; i++)
             {
@@ -37,15 +37,15 @@ namespace EBS
             
         };
         
-        Float likelihood(COUNTS counts, std::vector<Float> hyperParam)
+        Float likelihood()
         {
-            size_t G = counts.rows();
+            size_t G = _sum.rows();
             
             Float LL = 0;
             
             for(size_t i = 0; i < G; i++)
             {
-                LL += kernel(counts.row(i), _hp);
+                LL += kernel(_sum, _hp);
             }
             
             return LL;
@@ -55,6 +55,7 @@ namespace EBS
         
         std::vector<Float> _hp;
         
+        COUNTS _sum;
     
         
     };

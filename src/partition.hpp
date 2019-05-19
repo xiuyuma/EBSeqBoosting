@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Rcpp.h>
-#include <RcppEigen.h>
 #include <vector>
 #include <algorithm>
 

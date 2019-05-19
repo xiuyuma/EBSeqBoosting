@@ -1,9 +1,5 @@
 #pragma once
 
-#include <Eigen/Dense>
-#include <vector>
-#include <algorithm>
-#include "helper.hpp"
 #include "aggregate.hpp"
 
 namespace EBS
@@ -13,12 +9,15 @@ namespace EBS
     {
 
     public:
-        virtual float kernel(vector<Float> geneCounts, vector<Float> hyperParam)
+        virtual Float kernel(vector<Float> geneCounts, vector<Float> hyperParam)
         {
             return 0;
         }
         
-        
+        virtual vector<Float> derivative(COUNTS counts, vector<Float> hyperParam)
+        {
+            return vector<Float>();
+        }
     };
 
 };

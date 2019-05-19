@@ -4,7 +4,9 @@
 #include <vector>
 #include <algorithm>
 
-
+namespace EBS
+{
+    
 struct CLUSINFO
 {
     std::vector<std::vector<int> > index;
@@ -78,5 +80,5 @@ struct helper
     
 };
 
-
+};
 

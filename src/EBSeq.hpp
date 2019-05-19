@@ -4,16 +4,21 @@
 #include <vector>
 #include <algorithm>
 #include "helper.hpp"
+#include "aggregate.hpp"
 
-class EBSeq
+namespace EBS
 {
-
-public:
-    virtual float kernel(vector<float> geneCounts, vector<float> hyperParam)
+    
+    class EBSeq
     {
-        return 0;
-    }
-    
-    
-    
+
+    public:
+        virtual float kernel(vector<Float> geneCounts, vector<Float> hyperParam)
+        {
+            return 0;
+        }
+        
+        
+    };
+
 };

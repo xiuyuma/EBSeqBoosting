@@ -7,4 +7,6 @@ namespace EBS
   
     typedef Eigen::MatrixXd COUNTS;
     
+    typedef Eigen::ArrayXd VEC;
+    
 };

@@ -21,21 +21,7 @@ namespace EBS
             return COUNTS();
         }
         
-        void gradientAscent(COUNTS& _sum, COUNTS& hyperParam, std::vector<Float>& lrate)
-        {
-            size_t _n = hyperParam.size();
-            
-            assert(lrate.size() == _n);
-            
-            COUNTS drv = kernelDerivative(_sum, hyperParam);
-            
-            for(size_t i = 0; i < _n; i++)
-            {
-                
-            }
-            
-            
-        };
+        virtual void gradientAscent(COUNTS& _sum, COUNTS& hyperParam, std::vector<Float>& lrate){};
         
         Float likelihood()
         {

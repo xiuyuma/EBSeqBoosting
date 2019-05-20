@@ -16,18 +16,18 @@ namespace EBS
             return 0;
         }
         
-        virtual std::vector<Float> kernelDerivative(COUNTS& _sum, std::vector<Float>& hyperParam)
+        virtual COUNTS kernelDerivative(COUNTS& _sum, COUNTS& hyperParam)
         {
-            return std::vector<Float>();
+            return COUNTS();
         }
         
-        void gradientAscent(COUNTS& _sum, std::vector<Float>& hyperParam, std::vector<Float>& lrate)
+        void gradientAscent(COUNTS& _sum, COUNTS& hyperParam, std::vector<Float>& lrate)
         {
             size_t _n = hyperParam.size();
             
             assert(lrate.size() == _n);
             
-            std::vector<Float> drv = kernelDerivative(_sum, hyperParam);
+            COUNTS drv = kernelDerivative(_sum, hyperParam);
             
             for(size_t i = 0; i < _n; i++)
             {

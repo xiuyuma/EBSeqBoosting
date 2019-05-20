@@ -23,19 +23,7 @@ namespace EBS
         
         virtual void gradientAscent(COUNTS& _sum, COUNTS& hyperParam, std::vector<Float>& lrate){};
         
-        Float likelihood()
-        {
-            size_t G = _sum.rows();
-            
-            Float LL = 0;
-            
-            for(size_t i = 0; i < G; i++)
-            {
-                LL += kernel(_sum, _hp);
-            }
-            
-            return LL;
-        };
+        
         
     protected:
         

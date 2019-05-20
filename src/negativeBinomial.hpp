@@ -41,7 +41,7 @@ namespace EBS
                     q(i,0) = mn(i,0) / var(i,0);
             }
             
-            
+            _r = (mn.cwiseProduct(q)).array() / (I - q).array();
             
         }
         
@@ -50,6 +50,8 @@ namespace EBS
         {
             return 0;
         }
+        
+        void gradientAscent(COUNTS& _sum, COUNTS& hyperParam, std::vector<Float>& lrate){};
         
         
     private:

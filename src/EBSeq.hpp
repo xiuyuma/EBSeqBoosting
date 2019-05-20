@@ -42,7 +42,6 @@ namespace EBS
         std::vector<Float> _hp;
         
         COUNTS _sum;
-    
         
     };
 

@@ -64,9 +64,9 @@ namespace EBS
         
         // K - 1 "<" or "=", 1 for "<" and 0 for "="
         template <size_t K>
-        static std::bitset<K-1> mapToBit(vector<int>& part)
+        static std::bitset<K-1> mapToBit(std::vector<int>& part)
         {
-            static_asser(part.size() == K);
+            static_assert(part.size() == K);
             
             std::bitset<K-1> res;
             

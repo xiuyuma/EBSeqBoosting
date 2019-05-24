@@ -22,7 +22,7 @@ namespace EBS
         }
         
         virtual void gradientAscent(COUNTS& sum, COUNTS& hyperParam, std::vector<Float>& lrate){};
-        
+         
         
         
     protected:

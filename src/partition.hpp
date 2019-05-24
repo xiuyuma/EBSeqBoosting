@@ -67,10 +67,8 @@ namespace EBS
         {
             size_t K = part.size();
             
-            
             bool* res = new bool[K - 1];
             
-            // all one
             for(size_t i = 0; i < K - 1; i++)
             {
                 res[i] = 0;
@@ -82,6 +80,7 @@ namespace EBS
             return res;
             
         }
+        
     };
 
 };

@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
+
 
 namespace EBS
 {
@@ -63,22 +65,34 @@ namespace EBS
         }
         
         // K - 1 "<" or "=", 1 for "<" and 0 for "="
-        static bool* mapToBit(std::vector<int>& part)
+        static std::vector<bool> mapToBit(std::vector<int>& part)
         {
             size_t K = part.size();
             
-            bool* res = new bool[K - 1];
+            std::vector<bool> res(K - 1, 0);
             
             for(size_t i = 0; i < K - 1; i++)
             {
-                res[i] = 0;
-                
                 if(part[i] != part[i + 1]){res[i] = 1;}
-                
             }
             
             return res;
             
+        }
+        
+        static std::unordered_map<std::vector<bool>, size_t> buildHash(std::vector<std::vector<int> >& parts)
+        {
+            
+            std::unordered_map<std::vector<bool>, size_t> res;
+            
+            for(size_t i = 0; i < parts.size(); i++)
+            {
+                auto bit = mapToBit(parts[i]);
+                
+                res[bit] = i;
+            }
+            
+            return res;
         }
         
     };

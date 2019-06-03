@@ -10,11 +10,13 @@ namespace EBS
     {
     public:
         
-        void init(COUNTS& counts, CLUSINFO& clusInfo, std::vector<Float> hyperParam)
+        void init(COUNTS& counts, CLUSINFO& clusInfo, std::vector<Float> hyperParam, std::vector<Float>& lrate)
         {
             _sum = aggregate::sum(counts, clusInfo);
             
             _hp = hyperParam;
+            
+            _lrate = lrate;
             
             COUNTS _var = aggregate::groupVar(counts, clusInfo);
             
@@ -46,7 +48,7 @@ namespace EBS
         }
         
         
-        Float kernel(COUNTS& _sum, std::vector<Float>& hyperParam)
+        Float kernel()
         {
             return 0;
         }
@@ -58,6 +60,7 @@ namespace EBS
         
         COUNTS _r;
         
+        std::vector<Float> _lrate;
     };
     
 };

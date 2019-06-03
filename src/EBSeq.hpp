@@ -11,17 +11,17 @@ namespace EBS
         
     public:
         //on log scale
-        virtual Float kernel(COUNTS& sum, std::vector<Float>& hyperParam)
+        virtual Float kernel()
         {
             return 0;
         }
         
-        virtual COUNTS kernelDerivative(COUNTS& sum, COUNTS& hyperParam)
+        virtual COUNTS kernelDerivative()
         {
             return COUNTS();
         }
         
-        virtual void gradientAscent(COUNTS& sum, COUNTS& hyperParam, std::vector<Float>& lrate){};
+        virtual void gradientAscent(){};
          
         
         

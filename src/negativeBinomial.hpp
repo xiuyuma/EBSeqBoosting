@@ -48,12 +48,15 @@ namespace EBS
         }
         
         
-        Float kernel()
+        Float kernel(std::vector<int>& pat)
         {
             return 0;
         }
         
-        void gradientAscent(COUNTS& _sum, COUNTS& hyperParam, std::vector<Float>& lrate){};
+        void gradientAscent()
+        {
+            
+        }
         
         
     private:
@@ -61,6 +64,9 @@ namespace EBS
         COUNTS _r;
         
         std::vector<Float> _lrate;
+        
+        // prop of each nonzero pattern
+        Eigen::VectorXd _p;
     };
     
 };

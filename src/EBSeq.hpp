@@ -11,7 +11,7 @@ namespace EBS
         
     public:
         //on log scale
-        virtual Float kernel()
+        virtual Float kernel(std::vector<int>& pat)
         {
             return 0;
         }

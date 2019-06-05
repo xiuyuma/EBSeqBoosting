@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <algorithm>
+#include <numeric>
 
 namespace EBS
 {
@@ -54,7 +55,7 @@ struct helper
     }
     
     
-    static CLUSINFO clusInfo(std::vector<int> clus)
+    static CLUSINFO clusInfo(std::vector<int>& clus)
     {
         int K = *std::max_element(clus.begin(),clus.end());
         
@@ -74,6 +75,22 @@ struct helper
         res.index = index;
         
         res.size = size;
+        
+        return res;
+    }
+    
+    // expected type: row of eigen matrix
+    template<typename T>
+    static std::vector<size_t> sortIndexes(T ROW)
+    {
+        size_t K = ROW.size();
+        
+        std::vector<size_t> res(K);
+        
+        std::iota(res.begin(),res.end(),0);
+        
+        std::sort(res.begin(),res.end(),
+             [&ROW](size_t i1, size_t i2) {return ROW[i1] < ROW[i2];});
         
         return res;
     }

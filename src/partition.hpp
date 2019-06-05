@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
+#include "counts.hpp"
 
 
 namespace EBS
@@ -94,6 +95,31 @@ namespace EBS
             
             return res;
         }
+        
+        static COUNTS converter(std::vector<int>& part)
+        {
+            int sub_K = *std::max_element(part.begin(),part.end());
+            
+            int K = part.size();
+            
+            COUNTS res(K,sub_K);
+            
+            res.fill(0);
+            
+            for(int i = 1; i < sub_K + 1; i++)
+            {
+                for(int j = 0; j < K; j++)
+                {
+                    if(part[j] == i)
+                    {
+                        res(j,i) = 1;
+                    }
+                }
+            }
+        
+            return res;
+        }
+        
         
     };
 

@@ -85,14 +85,19 @@ struct helper
     {
         size_t K = ROW.size();
         
-        std::vector<size_t> res(K);
+        std::vector<size_t> tmp(K);
         
-        std::iota(res.begin(),res.end(),0);
+        std::iota(tmp.begin(),tmp.end(),0);
         
-        std::sort(res.begin(),res.end(),
-             [&ROW](size_t i1, size_t i2) {return ROW[i1] < ROW[i2];});
+        //res = tmp;
         
-        return res;
+        std::sort(tmp.begin(),tmp.end(),
+                  [&ROW](size_t i1, size_t i2) {return ROW[i1] < ROW[i2];});
+        
+        //std::sort(res.begin(),res.end(),
+        //          [&tmp](size_t i1, size_t i2){return tmp[i1] < tmp[i2];});
+        
+        return tmp;
     }
     
 };

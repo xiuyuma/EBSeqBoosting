@@ -2,6 +2,7 @@
 
 
 #include "EBSeq.hpp"
+#include <boost/math/special_functions/gamma.hpp>
 
 namespace EBS
 {
@@ -57,10 +58,33 @@ namespace EBS
         {
             size_t G = _mean.rows();
             
+            size_t K = _sum.cols();
+            
             for(size_t i = 0; i < G; i++)
             {
-                _order.push_back(helper::sortIndexes<ROW>(_mean.row(i)));
+                auto ord = helper::sortIndexes<ROW>(_mean.row(i));
+                
+                _order.push_back(ord);
+                
+                for(size_t j = 1; j < K; j++)
+                {
+                    Float s1 = _sum(i,ord[j - 1]);
+                    
+                    Float s2 = _sum(i,ord[j]);
+                    
+                    Float r1 = _clusinfo.size[ord[j - 1]] * _r(i,0);
+                    
+                    Float r2 = _clusinfo.size[ord[j]] * _r(i,0);
+                    
+                    
+                }
+                
+                
             }
+            
+            
+            
+            
         }
         
         Float kernel(std::vector<int>& pat)
@@ -76,7 +100,21 @@ namespace EBS
         }
         
         
+        Float kernel2case(Float& s1, Float& s2, Float& r1, Float& r2)
+        {
+            Float alpha = _hp[0];
+            
+            Float beta = _hp[1];
+            
+            Float res = lbeta(alpha + r1 + r2, beta + s1 + s2) + lbeta(alpha, beta) - lbeta(alpha + r1, beta + s1) - lbeta(alpha + r2, beta + s2);
+            
+            return res;
+        }
         
+        inline Float lbeta(Float x,Float y)
+        {
+            return boost::math::lgamma(x) + boost::math::lgamma(x) - boost::math::lgamma(x + y);
+        }
         
         
     private:

@@ -4,6 +4,7 @@
 #include "EBSeq.hpp"
 #include <cmath>
 #include <boost/math/special_functions/gamma.hpp>
+#include <set>
 
 namespace EBS
 {
@@ -65,6 +66,8 @@ namespace EBS
             
             std::vector<int> baseClus(K);
             
+            std::vector<std::vector<int>> dep;
+            
             for(size_t i = 0; i < G; i++)
             {
                 auto ord = helper::sortIndexes<ROW>(_mean.row(i));
@@ -98,16 +101,37 @@ namespace EBS
                         baseClus[j] = baseClus[j - 1] + 1;
                     }
                     
-                    std::cout << "G " << i << " P " << j << " sum " << s1 << " " << s2 <<" val " << abslogRatio[j - 1] << "\n";
                 }
                 
                 auto tmpOrd = helper::sortIndexes<std::vector<Float>>(abslogRatio);
                 
-                std::cout << "G " << i << "\n";
+                auto baseBit = partition::mapToBit(baseClus);
                 
-                std::cout << baseClus[0] << "," << baseClus[1] << "," << baseClus[2] << "\n";
+                auto pBit = partition::genBit(_uncertainty);
                 
-                std::cout << tmpOrd[0] << "," << tmpOrd[1] << "\n";
+                std::cout << "cluster to be considered\n";
+                
+                for(auto x:pBit)
+                {
+                    
+                    auto newBit = baseBit;
+                    
+                    for(int t = 0; t < _uncertainty; t++)
+                    {
+                        auto tmpJ = tmpOrd[t];
+                        
+                        newBit[tmpJ] = x[t];
+                    }
+                    
+                    auto newClus = partition::bitToPart(newBit);
+                    
+                    dep.push_back(newClus);
+                    
+                }
+                
+                
+                
+                
             }
             
             
@@ -161,6 +185,8 @@ namespace EBS
         int _uncertainty;
         
         std::vector<std::vector<size_t>> _order;
+        
+        
         
     };
     

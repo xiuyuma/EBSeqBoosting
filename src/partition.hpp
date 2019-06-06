@@ -81,6 +81,55 @@ namespace EBS
             
         }
         
+        static std::vector<int> bitToPart(std::vector<bool>& bits)
+        {
+            size_t K = bits.size();
+            
+            std::vector<int> res(K + 1);
+            
+            res[0] = 1;
+            
+            for(size_t i = 0; i < K; i++)
+            {
+                if(bits[i]){res[i + 1] = res[i] + 1;}
+                else{res[i + 1] = res[i];}
+            }
+            
+            return res;
+        }
+        
+        static std::vector<std::vector<bool>> genBit(int n)
+        {
+            std::vector<std::vector<bool>> res;
+            
+            res.push_back(std::vector<bool>(1,true));
+            
+            res.push_back(std::vector<bool>(1,false));
+            
+            for(int i = 1; i < n; i++)
+            {
+                std::vector<std::vector<bool>> tmp;
+                
+                for(auto x:res)
+                {
+                    
+                    auto y = x;
+                    
+                    x.push_back(true);
+                    
+                    tmp.push_back(x);
+                    
+                    y.push_back(false);
+                
+                    tmp.push_back(y);
+                }
+                
+                res = tmp;
+            }
+            
+            return res;
+        }
+        
         static std::unordered_map<std::vector<bool>, size_t> buildHash(std::vector<std::vector<int> >& parts)
         {
             

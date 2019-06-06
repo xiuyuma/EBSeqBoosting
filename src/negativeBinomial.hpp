@@ -98,6 +98,7 @@ namespace EBS
                         baseClus[j] = baseClus[j - 1] + 1;
                     }
                     
+                    std::cout << "G " << i << " P " << j << " sum " << s1 << " " << s2 <<" val " << tmp << "\n";
                 }
                 
                 auto tmpOrd = helper::sortIndexes<std::vector<Float>>(abslogRatio);
@@ -140,7 +141,7 @@ namespace EBS
         
         inline Float lbeta(Float x,Float y)
         {
-            return boost::math::lgamma(x) + boost::math::lgamma(x) - boost::math::lgamma(x + y);
+            return boost::math::lgamma(x) + boost::math::lgamma(y) - boost::math::lgamma(x + y);
         }
         
         

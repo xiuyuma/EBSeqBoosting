@@ -2,6 +2,7 @@
 
 
 #include "EBSeq.hpp"
+#include <cmath>
 #include <boost/math/special_functions/gamma.hpp>
 
 namespace EBS
@@ -42,7 +43,7 @@ namespace EBS
             _r = (mn.cwiseProduct(q)).array() / (I - q).array();
         }
         
-        void init(std::vector<Float> hyperParam, std::vector<Float>& lrate, int UC)
+        void init(std::vector<Float> hyperParam, std::vector<Float> lrate, int UC)
         {
             assert(UC < _sum.cols());
             
@@ -60,11 +61,17 @@ namespace EBS
             
             size_t K = _sum.cols();
             
+            std::vector<Float> abslogRatio(K);
+            
+            std::vector<int> baseClus(K);
+            
             for(size_t i = 0; i < G; i++)
             {
                 auto ord = helper::sortIndexes<ROW>(_mean.row(i));
                 
                 _order.push_back(ord);
+                
+                baseClus[0] = 1;
                 
                 for(size_t j = 1; j < K; j++)
                 {
@@ -76,10 +83,30 @@ namespace EBS
                     
                     Float r2 = _clusinfo.size[ord[j]] * _r(i,0);
                     
+                    Float tmp = kernel2case(s1,s2,r1,r2);
+                    
+                    abslogRatio.push_back(abs(tmp));
+                    
+                    //  more favorable for equal mean
+                    if(tmp > 0)
+                    {
+                        baseClus[j] = baseClus[j - 1];
+                    }
+                    else
+                    {
+                        // DE start a new cluster
+                        baseClus[j] = baseClus[j - 1] + 1;
+                    }
                     
                 }
                 
+                auto tmpOrd = helper::sortIndexes<std::vector<Float>>(abslogRatio);
                 
+                std::cout << "G " << i << "\n";
+                
+                std::cout << baseClus[0] << "," << baseClus[1] << "," << baseClus[2] << "\n";
+                
+                std::cout << tmpOrd[0] << "," << tmpOrd[1] << "," << tmpOrd[2] << "\n";
             }
             
             

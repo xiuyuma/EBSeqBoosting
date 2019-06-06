@@ -61,7 +61,7 @@ namespace EBS
             
             size_t K = _sum.cols();
             
-            std::vector<Float> abslogRatio(K);
+            std::vector<Float> abslogRatio(K - 1);
             
             std::vector<int> baseClus(K);
             
@@ -85,7 +85,7 @@ namespace EBS
                     
                     Float tmp = kernel2case(s1,s2,r1,r2);
                     
-                    abslogRatio.push_back(abs(tmp));
+                    abslogRatio[j - 1] = abs(tmp);
                     
                     //  more favorable for equal mean
                     if(tmp > 0)
@@ -98,7 +98,7 @@ namespace EBS
                         baseClus[j] = baseClus[j - 1] + 1;
                     }
                     
-                    std::cout << "G " << i << " P " << j << " sum " << s1 << " " << s2 <<" val " << tmp << "\n";
+                    std::cout << "G " << i << " P " << j << " sum " << s1 << " " << s2 <<" val " << abslogRatio[j - 1] << "\n";
                 }
                 
                 auto tmpOrd = helper::sortIndexes<std::vector<Float>>(abslogRatio);
@@ -107,7 +107,7 @@ namespace EBS
                 
                 std::cout << baseClus[0] << "," << baseClus[1] << "," << baseClus[2] << "\n";
                 
-                std::cout << tmpOrd[0] << "," << tmpOrd[1] << "," << tmpOrd[2] << "\n";
+                std::cout << tmpOrd[0] << "," << tmpOrd[1] << "\n";
             }
             
             

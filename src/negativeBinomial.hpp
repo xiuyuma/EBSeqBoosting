@@ -72,8 +72,6 @@ namespace EBS
             {
                 auto ord = helper::sortIndexes<ROW>(_mean.row(i));
                 
-                _order.push_back(ord);
-                
                 baseClus[0] = 1;
                 
                 for(size_t j = 1; j < K; j++)
@@ -109,8 +107,7 @@ namespace EBS
                 
                 auto pBit = partition::genBit(_uncertainty);
                 
-                std::cout << "cluster to be considered\n";
-                
+                // get promising DE pattern
                 for(auto x:pBit)
                 {
                     
@@ -124,6 +121,8 @@ namespace EBS
                     }
                     
                     auto newClus = partition::bitToPart(newBit);
+                    
+                    std::sort(newClus.begin(),newClus.end(),[&ord](size_t i1, size_t i2){return ord[i1] < ord[i2];});
                     
                     dep.push_back(newClus);
                     
@@ -183,9 +182,6 @@ namespace EBS
         std::unordered_map<int, std::vector<int>> _hash;
         
         int _uncertainty;
-        
-        std::vector<std::vector<size_t>> _order;
-        
         
         
     };

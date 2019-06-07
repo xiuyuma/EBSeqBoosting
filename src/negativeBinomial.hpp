@@ -131,7 +131,7 @@ namespace EBS
                     
 //                    std::cout << "G " << i << " ";
 //
-//                    for(auto C : newClusOrd)
+//                    for(auto C : sClus)
 //                        std::cout << C << ",";
 //
 //                    std::cout << "\n";

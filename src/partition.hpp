@@ -182,7 +182,7 @@ namespace EBS
             
             for(size_t i = 0; i < part.size(); i++)
             {
-                res += char(part[i]);
+                res += std::to_string(part[i]);
             }
             
             return  res;

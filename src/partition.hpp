@@ -103,6 +103,11 @@ namespace EBS
         {
             std::vector<std::vector<bool>> res;
             
+            if(n == 0)
+            {
+                return res;
+            }
+            
             res.push_back(std::vector<bool>(1,true));
             
             res.push_back(std::vector<bool>(1,false));

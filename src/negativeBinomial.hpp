@@ -66,8 +66,6 @@ namespace EBS
             
             std::vector<int> baseClus(K);
             
-            std::vector<std::vector<int>> dep;
-            
             for(size_t i = 0; i < G; i++)
             {
                 auto ord = helper::sortIndexes<ROW>(_mean.row(i));
@@ -124,19 +122,23 @@ namespace EBS
                     
                     std::sort(newClus.begin(),newClus.end(),[&ord](size_t i1, size_t i2){return ord[i1] < ord[i2];});
                     
-                    dep.push_back(newClus);
+                    auto newClusOrd = partition::reorder(newClus);
+                    
+                    std::cout << "ORD " << newClusOrd[0] << " " << newClusOrd[1] << " " << newClusOrd[2] << "\n";
+                    
+                    _dep.insert(newClusOrd);
                     
                 }
                 
-                
-                
-                
             }
             
-            
-            
-            
         }
+        
+        size_t DEPsize()
+        {
+            return _dep.size();
+        }
+        
         
         Float kernel(std::vector<int>& pat)
         {
@@ -183,7 +185,7 @@ namespace EBS
         
         int _uncertainty;
         
-        
+        std::set<std::vector<int>> _dep;
     };
     
 };

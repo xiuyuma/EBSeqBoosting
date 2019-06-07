@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include "counts.hpp"
-
+#include <unordered_set>
 
 namespace EBS
 {
@@ -129,6 +129,52 @@ namespace EBS
             
             return res;
         }
+        
+        static std::vector<int> reorder(std::vector<int>& part)
+        {
+            size_t K = part.size();
+            
+            std::vector<int> res(K);
+            
+            int submax = *std::max_element(part.begin(),part.end());
+            
+            std::unordered_set<int> seen;
+            
+            size_t i = 0;
+            
+            int label = 1;
+            
+            while(seen.size() < K)
+            {
+                int tmpLabel = part[i];
+                
+                for(int j = 0; j < K; j++)
+                {
+                    if(part[j] == tmpLabel)
+                    {
+                        res[j] = label;
+                        
+                        seen.insert(j);
+                    }
+                }
+                
+                label++;
+                
+                for(int t = i; t < K; t++)
+                {
+                    if(seen.find(t) == seen.end())
+                    {
+                        i = t;
+                        
+                        break;
+                    }
+                }
+                
+            }
+            
+            return res;
+        }
+        
         
         static std::unordered_map<std::vector<bool>, size_t> buildHash(std::vector<std::vector<int> >& parts)
         {

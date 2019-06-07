@@ -44,7 +44,7 @@ namespace EBS
             _r = (mn.cwiseProduct(q)).array() / (I - q).array();
         }
         
-        void init(std::vector<Float> hyperParam, std::vector<Float> lrate, int UC)
+        void init(std::vector<Float> hyperParam, std::vector<Float> lrate, int UC, Float thre)
         {
             assert(UC < _sum.cols());
             
@@ -53,6 +53,8 @@ namespace EBS
             _lrate = lrate;
             
             _uncertainty = UC;
+            
+            _threshold = thre;
         }
         
         // only to be called in init
@@ -105,7 +107,15 @@ namespace EBS
                 
                 auto baseBit = partition::mapToBit(baseClus);
                 
-                auto pBit = partition::genBit(_uncertainty);
+                int localUC = 0;
+                
+                while(abslogRatio[localUC] < _threshold && localUC < _uncertainty)
+                {
+                    localUC++;
+                }
+                
+                
+                auto pBit = partition::genBit(localUC);
                 
                 // get promising DE pattern
                 for(auto x:pBit)
@@ -134,14 +144,6 @@ namespace EBS
                     auto sClus = partition::toString<std::vector<int>>(newClusOrd);
                     
                     _dep.insert(sClus);
-                    
-                    
-//                    std::cout << "G " << i << " ";
-//
-//                    for(auto C : sClus)
-//                        std::cout << C << ",";
-//
-//                    std::cout << "\n";
                     
                 }
                 
@@ -201,10 +203,14 @@ namespace EBS
         // prop of each nonzero pattern
         Eigen::VectorXd _p;
         
-        //std::unordered_map<int, std::vector<int>> _hash;
         
+        // upper bound of unsure "<" and "=", controlling number of patterns DE
         int _uncertainty;
         
+        // positve threshold to decide how many uncertain patterns
+        Float _threshold;
+        
+        // DE patterns to be considered
         std::set<std::string> _dep;
     };
     

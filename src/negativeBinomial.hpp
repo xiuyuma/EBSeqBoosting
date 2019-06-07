@@ -70,6 +70,8 @@ namespace EBS
             {
                 auto ord = helper::sortIndexes<ROW>(_mean.row(i));
                 
+                auto ord2 = helper::sortIndexes2<ROW>(_mean.row(i));
+                
                 baseClus[0] = 1;
                 
                 for(size_t j = 1; j < K; j++)
@@ -120,11 +122,16 @@ namespace EBS
                     
                     auto newClus = partition::bitToPart(newBit);
                     
-                    std::sort(newClus.begin(),newClus.end(),[&ord](size_t i1, size_t i2){return ord[i1] < ord[i2];});
+                    auto newClusOr = newClus;
                     
-                    auto newClusOrd = partition::reorder(newClus);
+                    for(size_t iter = 0; iter < ord2.size(); iter++)
+                    {
+                        newClusOr[iter] = newClus[ord2[iter]];
+                    }
                     
-                    auto sClus = partition::toString(newClusOrd);
+                    auto newClusOrd = partition::reorder(newClusOr);
+                    
+                    auto sClus = partition::toString<std::vector<int>>(newClusOrd);
                     
                     _dep.insert(sClus);
                     

@@ -176,7 +176,8 @@ namespace EBS
             return res;
         }
         
-        static std::string toString(std::vector<int> part)
+        template <typename T>
+        static std::string toString(T part)
         {
             std::string res = "";
             

@@ -100,6 +100,26 @@ struct helper
         return tmp;
     }
     
+    template<typename T>
+    static std::vector<size_t> sortIndexes2(T ROW)
+    {
+        size_t K = ROW.size();
+        
+        std::vector<size_t> tmp(K),res;
+        
+        std::iota(tmp.begin(),tmp.end(),0);
+        
+        res = tmp;
+        
+        std::sort(tmp.begin(),tmp.end(),
+                  [&ROW](size_t i1, size_t i2) {return ROW[i1] < ROW[i2];});
+        
+        std::sort(res.begin(),res.end(),
+                  [&tmp](size_t i1, size_t i2){return tmp[i1] < tmp[i2];});
+        
+        return res;
+    }
+    
 };
 
 };

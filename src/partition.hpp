@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include "counts.hpp"
 #include <unordered_set>
+#include <string>
 
 namespace EBS
 {
@@ -174,6 +175,19 @@ namespace EBS
             
             return res;
         }
+        
+        static std::string toString(std::vector<int> part)
+        {
+            std::string res = "";
+            
+            for(size_t i = 0; i < part.size(); i++)
+            {
+                res += char(part[i]);
+            }
+            
+            return  res;
+        }
+        
         
         
         static std::unordered_map<std::vector<bool>, size_t> buildHash(std::vector<std::vector<int> >& parts)

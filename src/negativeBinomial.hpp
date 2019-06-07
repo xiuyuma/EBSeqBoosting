@@ -124,7 +124,9 @@ namespace EBS
                     
                     auto newClusOrd = partition::reorder(newClus);
                     
-                    _dep.insert(newClusOrd);
+                    auto sClus = partition::toString(newClusOrd);
+                    
+                    _dep.insert(sClus);
                     
                     
 //                    std::cout << "G " << i << " ";
@@ -145,7 +147,7 @@ namespace EBS
             return _dep.size();
         }
         
-        std::set<std::vector<int>> getDEP()
+        std::set<std::string> getDEP()
         {
             return _dep;
         }
@@ -192,11 +194,11 @@ namespace EBS
         // prop of each nonzero pattern
         Eigen::VectorXd _p;
         
-        std::unordered_map<int, std::vector<int>> _hash;
+        //std::unordered_map<int, std::vector<int>> _hash;
         
         int _uncertainty;
         
-        std::set<std::vector<int>> _dep;
+        std::set<std::string> _dep;
     };
     
 };

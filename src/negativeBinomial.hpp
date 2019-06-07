@@ -124,9 +124,15 @@ namespace EBS
                     
                     auto newClusOrd = partition::reorder(newClus);
                     
-                    std::cout << "ORD " << newClusOrd[0] << " " << newClusOrd[1] << " " << newClusOrd[2] << "\n";
-                    
                     _dep.insert(newClusOrd);
+                    
+                    
+//                    std::cout << "G " << i << " ";
+//
+//                    for(auto C : newClusOrd)
+//                        std::cout << C << ",";
+//
+//                    std::cout << "\n";
                     
                 }
                 
@@ -137,6 +143,11 @@ namespace EBS
         size_t DEPsize()
         {
             return _dep.size();
+        }
+        
+        std::set<std::vector<int>> getDEP()
+        {
+            return _dep;
         }
         
         

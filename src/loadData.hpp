@@ -10,8 +10,8 @@ namespace EBS
 {
     
     // very coarse function, for test
-    // need to number of rows and columns
-    //
+    // need number of rows and columns and input are file of integers
+    
     COUNTS readData(std::string path, char delim, int G, int n)
     {
         std::ifstream File;

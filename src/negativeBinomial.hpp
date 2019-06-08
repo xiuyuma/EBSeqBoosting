@@ -88,11 +88,10 @@ namespace EBS
                     
                     Float tmp = kernel2case(s1,s2,r1,r2);
                     
-                    // all 0 cases
-                    if(tmp == 0)
-                    {
-                        tmp = 10;
-                    }
+//                    if(tmp < 1)
+//                    {
+//                        std::cout << "i " << i <<"," << s1 << "," << s2 << "," << r1 << "," << r2 << "\n";
+//                    }
                     
                     abslogRatio[j - 1] = abs(tmp);
                     
@@ -191,6 +190,13 @@ namespace EBS
         
         Float kernel2case(Float& s1, Float& s2, Float& r1, Float& r2)
         {
+            
+            if(s1 == 0 && s2 == 0)
+            {
+                return 10;
+            }
+            
+            
             Float alpha = _hp[0];
             
             Float beta = _hp[1];

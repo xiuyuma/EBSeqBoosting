@@ -88,7 +88,14 @@ namespace EBS
                     
                     Float tmp = kernel2case(s1,s2,r1,r2);
                     
+                    // all 0 cases
+                    if(tmp == 0)
+                    {
+                        tmp = 10;
+                    }
+                    
                     abslogRatio[j - 1] = abs(tmp);
+                    
                     
                     //  more favorable for equal mean
                     if(tmp > 0)
@@ -109,11 +116,14 @@ namespace EBS
                 
                 int localUC = 0;
                 
-                while(abslogRatio[localUC] < _threshold && localUC < _uncertainty)
+                while(abslogRatio[localUC] < _threshold)
                 {
                     localUC++;
                 }
                 
+                _guc.push_back(localUC);
+                
+                localUC = std::min(localUC , _uncertainty);
                 
                 auto pBit = partition::genBit(localUC);
                 
@@ -161,6 +171,10 @@ namespace EBS
             return _dep;
         }
         
+        std::vector<size_t> getGUC()
+        {
+            return _guc;
+        }
         
         Float kernel(std::vector<int>& pat)
         {
@@ -212,6 +226,9 @@ namespace EBS
         
         // DE patterns to be considered
         std::set<std::string> _dep;
+        
+        // gene level uncertainty
+        std::vector<size_t> _guc;
     };
     
 };

@@ -100,11 +100,15 @@ namespace EBS
             return _pat;
         }
         
-        // expected T be Float or COUNTS.
-        template<typename T>
-        inline T lbeta(T x,T y)
+        
+        inline Float lbeta(Float x,Float y)
         {
             return boost::math::lgamma(x) + boost::math::lgamma(y) - boost::math::lgamma(x + y);
+        }
+        
+        inline COUNTS lbeta(COUNTS& A, COUNTS& B)
+        {
+            return A.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) + B.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) - (A + B).unaryExpr<Float(*)(Float)>(&boost::math::lgamma);
         }
     
         
@@ -240,7 +244,7 @@ namespace EBS
             
             Float beta = _hp[1];
             
-            Float res = lbeta<Float>(alpha + r1 + r2, beta + s1 + s2) + lbeta<Float>(alpha, beta) - lbeta<Float>(alpha + r1, beta + s1) - lbeta<Float>(alpha + r2, beta + s2);
+            Float res = lbeta(alpha + r1 + r2, beta + s1 + s2) + lbeta(alpha, beta) - lbeta(alpha + r1, beta + s1) - lbeta(alpha + r2, beta + s2);
             
             return res;
         }

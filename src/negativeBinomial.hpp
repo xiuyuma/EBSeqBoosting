@@ -85,15 +85,6 @@ namespace EBS
             return _pat;
         }
         
-        Float kernel(std::vector<int>& pat)
-        {
-            return 0;
-        }
-        
-        void gradientAscent()
-        {
-            
-        }
         
         inline Float lbeta(Float x,Float y)
         {
@@ -212,11 +203,11 @@ namespace EBS
         // only to be called in init, after called DEpat
         void genPat()
         {
-            int n = _dep.size();
+            size_t n = _dep.size();
             
             assert(n > 0);
             
-            int K = _dep.begin()->size();
+            size_t K = _dep.begin()->size();
             
             _pat.resize(n,K);
             
@@ -254,7 +245,15 @@ namespace EBS
             return res;
         }
         
+        Float kernel(std::vector<int>& pat)
+        {
+            return 0;
+        }
         
+        void gradientAscent()
+        {
+            
+        }
         
         
     private:

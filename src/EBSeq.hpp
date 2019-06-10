@@ -12,17 +12,6 @@ namespace EBS
     {
         
     public:
-        //on log scale
-        virtual Float kernel(std::vector<int>& pat)
-        {
-            return 0;
-        }
-        
-        virtual COUNTS kernelDerivative()
-        {
-            return COUNTS();
-        }
-        
         virtual void gradientAscent(){};
          
         EBSeq(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster)
@@ -32,6 +21,18 @@ namespace EBS
             _sum = aggregate::sum(scRNAexpMatrix, _clusinfo);
             
             _mean = aggregate::groupMean(scRNAexpMatrix, _clusinfo);
+        }
+        
+    protected:
+        //on log scale
+        virtual Float kernel(std::vector<int>& pat)
+        {
+            return 0;
+        }
+        
+        virtual COUNTS kernelDerivative()
+        {
+            return COUNTS();
         }
         
     protected:

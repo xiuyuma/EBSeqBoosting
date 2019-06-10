@@ -60,8 +60,6 @@ namespace EBS
             _filter = filter;
             
             DEpat();
-            
-            genPat();
         }
         
         
@@ -80,7 +78,7 @@ namespace EBS
             return _guc;
         }
         
-        COUNTS getPAT()
+        std::vector<COUNTS> getPAT()
         {
             return _pat;
         }
@@ -192,7 +190,12 @@ namespace EBS
                     
                     auto sClus = partition::toString<std::vector<int>>(newClusOrd);
                     
-                    _dep.insert(sClus);
+                    if(_dep.find(sClus) == _dep.end())
+                    {
+                        _dep.insert(sClus);
+                        
+                        _pat.push_back(partition::toMatrix(newClusOrd));
+                    }
                     
                 }
                 
@@ -200,32 +203,7 @@ namespace EBS
             
         }
         
-        // only to be called in init, after called DEpat
-        void genPat()
-        {
-            size_t n = _dep.size();
-            
-            assert(n > 0);
-            
-            size_t K = _dep.begin()->size();
-            
-            _pat.resize(n,K);
-            
-            size_t row = 0;
-            
-            for(auto it = _dep.begin(); it != _dep.end(); it++)
-            {
-                auto tmp = *it;
-                
-                for(size_t col = 0; col < tmp.size(); col++)
-                {
-                    _pat(row,col) = tmp[col] - '0';
-                }
-                
-                row++;
-            }
-            
-        }
+        
         
         Float kernel2case(Float& s1, Float& s2, Float& r1, Float& r2, int n1, int n2)
         {
@@ -234,7 +212,6 @@ namespace EBS
             {
                 return 10;
             }
-            
             
             Float alpha = _hp[0];
             
@@ -245,8 +222,10 @@ namespace EBS
             return res;
         }
         
-        Float kernel(std::vector<int>& pat)
+        Float kernel()
         {
+            
+            
             return 0;
         }
         
@@ -282,7 +261,7 @@ namespace EBS
         // gene level uncertainty
         std::vector<size_t> _guc;
         
-        COUNTS _pat;
+        std::vector<COUNTS> _pat;
     };
     
 };

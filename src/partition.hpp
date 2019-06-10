@@ -182,7 +182,7 @@ namespace EBS
         }
         
         template <typename T>
-        static std::string toString(T part)
+        static std::string toString(T& part)
         {
             std::string res = "";
             
@@ -194,6 +194,30 @@ namespace EBS
             return  res;
         }
         
+        // convert string representation of partition to matrix
+        static COUNTS toMatrix (std::vector<int>& part)
+        {
+            int submax = *std::max_element(part.begin(),part.end());
+            
+            size_t K = part.size();
+
+            COUNTS res(K,submax);
+            
+            res.fill(0);
+            
+            for(int i = 0; i < submax; i++)
+            {
+                for(int j = 0; j < K; j++)
+                {
+                    if(part[j] == i + 1)
+                    {
+                        res(j,i) = 1;
+                    }
+                }
+            }
+            
+            return res;
+        }
         
         
         static std::unordered_map<std::vector<bool>, size_t> buildHash(std::vector<std::vector<int> >& parts)
@@ -211,29 +235,7 @@ namespace EBS
             return res;
         }
         
-        static COUNTS converter(std::vector<int>& part)
-        {
-            int sub_K = *std::max_element(part.begin(),part.end());
-            
-            int K = part.size();
-            
-            COUNTS res(K,sub_K);
-            
-            res.fill(0);
-            
-            for(int i = 1; i < sub_K + 1; i++)
-            {
-                for(int j = 0; j < K; j++)
-                {
-                    if(part[j] == i)
-                    {
-                        res(j,i) = 1;
-                    }
-                }
-            }
         
-            return res;
-        }
         
         
     };

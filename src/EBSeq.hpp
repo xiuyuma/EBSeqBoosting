@@ -25,7 +25,7 @@ namespace EBS
         
     protected:
         //on log scale
-        virtual Float kernel(std::vector<int>& pat)
+        virtual Float kernel()
         {
             return 0;
         }

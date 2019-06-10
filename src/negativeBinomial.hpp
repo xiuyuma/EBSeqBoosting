@@ -44,7 +44,8 @@ namespace EBS
             _r = (mn.cwiseProduct(q)).array() / (I - q).array();
         }
         
-        void init(std::vector<Float> hyperParam, std::vector<Float> lrate, int UC, Float thre)
+        
+        void init(std::vector<Float> hyperParam, std::vector<Float> lrate, int UC, Float thre, Float filter)
         {
             assert(UC < _sum.cols());
             
@@ -55,8 +56,52 @@ namespace EBS
             _uncertainty = UC;
             
             _threshold = thre;
+            
+            _filter = filter;
+            
+            DEpat();
+            
+            genPat();
         }
         
+        
+        size_t DEPsize()
+        {
+            return _dep.size();
+        }
+        
+        std::set<std::string> getDEP()
+        {
+            return _dep;
+        }
+        
+        std::vector<size_t> getGUC()
+        {
+            return _guc;
+        }
+        
+        COUNTS getPAT()
+        {
+            return _pat;
+        }
+        
+        Float kernel(std::vector<int>& pat)
+        {
+            return 0;
+        }
+        
+        void gradientAscent()
+        {
+            
+        }
+        
+        inline Float lbeta(Float x,Float y)
+        {
+            return boost::math::lgamma(x) + boost::math::lgamma(y) - boost::math::lgamma(x + y);
+        }
+    
+    
+    private:
         // only to be called in init
         void DEpat()
         {
@@ -92,10 +137,10 @@ namespace EBS
                     
                     Float tmp = kernel2case(s1,s2,r1,r2,n1,n2);
                     
-//                    if(tmp < 1)
-//                    {
-//                        std::cout << "i " << i <<"," << s1 << "," << s2 << "," << r1 << "," << r2 << "\n";
-//                    }
+                    //                    if(tmp < 1)
+                    //                    {
+                    //                        std::cout << "i " << i <<"," << s1 << "," << s2 << "," << r1 << "," << r2 << "\n";
+                    //                    }
                     
                     abslogRatio[j - 1] = abs(tmp);
                     
@@ -164,38 +209,37 @@ namespace EBS
             
         }
         
-        size_t DEPsize()
+        // only to be called in init, after called DEpat
+        void genPat()
         {
-            return _dep.size();
-        }
-        
-        std::set<std::string> getDEP()
-        {
-            return _dep;
-        }
-        
-        std::vector<size_t> getGUC()
-        {
-            return _guc;
-        }
-        
-        Float kernel(std::vector<int>& pat)
-        {
-            return 0;
+            int n = _dep.size();
             
+            assert(n > 0);
+            
+            int K = _dep.begin()->size();
+            
+            _pat.resize(n,K);
+            
+            size_t row = 0;
+            
+            for(auto it = _dep.begin(); it != _dep.end(); it++)
+            {
+                auto tmp = *it;
+                
+                for(size_t col = 0; col < tmp.size(); col++)
+                {
+                    _pat(row,col) = tmp[col] - '0';
+                }
+                
+                row++;
+            }
             
         }
-        
-        void gradientAscent()
-        {
-            
-        }
-        
         
         Float kernel2case(Float& s1, Float& s2, Float& r1, Float& r2, int n1, int n2)
         {
             // if too small mean, assume they are the same
-            if(s1 / n1 <= 5 && s2 / n2 <= 5)
+            if(s1 / n1 < _filter && s2 / n2 <_filter )
             {
                 return 10;
             }
@@ -210,10 +254,7 @@ namespace EBS
             return res;
         }
         
-        inline Float lbeta(Float x,Float y)
-        {
-            return boost::math::lgamma(x) + boost::math::lgamma(y) - boost::math::lgamma(x + y);
-        }
+        
         
         
     private:
@@ -227,9 +268,11 @@ namespace EBS
         // prop of each nonzero pattern
         Eigen::VectorXd _p;
         
-        
         // upper bound of unsure "<" and "=", controlling number of patterns DE
         int _uncertainty;
+        
+        // at least one group mean should be no smaller than this value to do DE comparison
+        Float _filter;
         
         // positve threshold to decide how many uncertain patterns
         Float _threshold;
@@ -239,6 +282,8 @@ namespace EBS
         
         // gene level uncertainty
         std::vector<size_t> _guc;
+        
+        COUNTS _pat;
     };
     
 };

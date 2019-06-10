@@ -82,11 +82,15 @@ namespace EBS
                     
                     Float s2 = _sum(i,ord[j]);
                     
-                    Float r1 = _clusinfo.size[ord[j - 1]] * _r(i,0);
+                    int n1 = _clusinfo.size[ord[j - 1]];
                     
-                    Float r2 = _clusinfo.size[ord[j]] * _r(i,0);
+                    int n2 = _clusinfo.size[ord[j]];
                     
-                    Float tmp = kernel2case(s1,s2,r1,r2);
+                    Float r1 = n1 * _r(i,0);
+                    
+                    Float r2 = n2 * _r(i,0);
+                    
+                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2);
                     
 //                    if(tmp < 1)
 //                    {
@@ -188,10 +192,10 @@ namespace EBS
         }
         
         
-        Float kernel2case(Float& s1, Float& s2, Float& r1, Float& r2)
+        Float kernel2case(Float& s1, Float& s2, Float& r1, Float& r2, int n1, int n2)
         {
-            
-            if(s1 == 0 && s2 == 0)
+            // if too small mean, assume they are the same
+            if(s1 / n1 <= 5 && s2 / n2 <= 5)
             {
                 return 10;
             }

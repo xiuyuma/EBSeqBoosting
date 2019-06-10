@@ -23,9 +23,14 @@ namespace EBS
             _mean = aggregate::groupMean(scRNAexpMatrix, _clusinfo);
         }
         
+        virtual Float LogLikelihood()
+        {
+            return 0;
+        }
+        
     protected:
         //on log scale
-        virtual Float kernel()
+        virtual Float kernel(COUNTS& p)
         {
             return 0;
         }

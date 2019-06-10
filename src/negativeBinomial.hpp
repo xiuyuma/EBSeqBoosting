@@ -30,7 +30,7 @@ namespace EBS
             
             mn = scRNAexpMatrix.rowwise().mean();
             
-            for(int i = 0; i < G; i++){
+            for(size_t i = 0; i < G; i++){
                 
                 if(abs(var(i,0) - 0) < 0.0001)
                     var(i,0) = 1;
@@ -42,6 +42,15 @@ namespace EBS
             }
             
             _r = (mn.cwiseProduct(q)).array() / (I - q).array();
+            
+            auto tmp = _clusinfo.size;
+            
+            _csize.resize(1,tmp.size());
+            
+            for(size_t i = 0; i < tmp.size(); i++)
+            {
+                _csize(0,i) = tmp[i];
+            }
         }
         
         
@@ -60,6 +69,14 @@ namespace EBS
             _filter = filter;
             
             DEpat();
+            
+            size_t n = _dep.size();
+            
+            assert(n > 0);
+            
+            _p.resize(n);
+            
+            _p.fill(1.0 / n);
         }
         
         
@@ -68,7 +85,7 @@ namespace EBS
             return _dep.size();
         }
         
-        std::set<std::string> getDEP()
+        std::vector<std::vector<int>> getDEP()
         {
             return _dep;
         }
@@ -83,13 +100,14 @@ namespace EBS
             return _pat;
         }
         
-        
-        inline Float lbeta(Float x,Float y)
+        // expected T be Float or COUNTS.
+        template<typename T>
+        inline T lbeta(T x,T y)
         {
             return boost::math::lgamma(x) + boost::math::lgamma(y) - boost::math::lgamma(x + y);
         }
     
-    
+        
     private:
         // only to be called in init
         void DEpat()
@@ -101,6 +119,9 @@ namespace EBS
             std::vector<Float> abslogRatio(K - 1);
             
             std::vector<int> baseClus(K);
+            
+            // DE patterns to be considered
+            std::set<std::string> dep;
             
             for(size_t i = 0; i < G; i++)
             {
@@ -120,9 +141,9 @@ namespace EBS
                     
                     int n2 = _clusinfo.size[ord[j]];
                     
-                    Float r1 = n1 * _r(i,0);
+                    Float r1 = n1 * _r(i);
                     
-                    Float r2 = n2 * _r(i,0);
+                    Float r2 = n2 * _r(i);
                     
                     Float tmp = kernel2case(s1,s2,r1,r2,n1,n2);
                     
@@ -190,9 +211,11 @@ namespace EBS
                     
                     auto sClus = partition::toString<std::vector<int>>(newClusOrd);
                     
-                    if(_dep.find(sClus) == _dep.end())
+                    if(dep.find(sClus) == dep.end())
                     {
-                        _dep.insert(sClus);
+                        dep.insert(sClus);
+                        
+                        _dep.push_back(newClusOrd);
                         
                         _pat.push_back(partition::toMatrix(newClusOrd));
                     }
@@ -210,20 +233,24 @@ namespace EBS
             // if too small mean, assume they are the same
             if(s1 / n1 < _filter && s2 / n2 <_filter )
             {
-                return 10;
+                return INT_MAX;
             }
             
             Float alpha = _hp[0];
             
             Float beta = _hp[1];
             
-            Float res = lbeta(alpha + r1 + r2, beta + s1 + s2) + lbeta(alpha, beta) - lbeta(alpha + r1, beta + s1) - lbeta(alpha + r2, beta + s2);
+            Float res = lbeta<Float>(alpha + r1 + r2, beta + s1 + s2) + lbeta<Float>(alpha, beta) - lbeta<Float>(alpha + r1, beta + s1) - lbeta<Float>(alpha + r2, beta + s2);
             
             return res;
         }
         
-        Float kernel()
+        Float kernel(COUNTS& p)
         {
+            auto aggregateByClus = _sum * p;
+            
+            auto rByClus = _r * _csize * p;
+            
             
             
             return 0;
@@ -241,6 +268,8 @@ namespace EBS
         
         COUNTS _r;
         
+        COUNTS _csize;
+        
         std::vector<Float> _lrate;
         
         // prop of each nonzero pattern
@@ -255,13 +284,14 @@ namespace EBS
         // positve threshold to decide how many uncertain patterns
         Float _threshold;
         
-        // DE patterns to be considered
-        std::set<std::string> _dep;
-        
         // gene level uncertainty
         std::vector<size_t> _guc;
         
+        // matrix for DE pattern
         std::vector<COUNTS> _pat;
+        
+        // vector for DE pattern
+        std::vector<std::vector<int>> _dep;
     };
     
 };

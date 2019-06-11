@@ -113,6 +113,26 @@ namespace EBS
             return A.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) + B.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) - (A + B).unaryExpr<Float(*)(Float)>(&boost::math::lgamma);
         }
     
+        void set(Float alpha, Eigen::VectorXd& beta)
+        {
+            _alpha = alpha;
+            
+            _beta = beta;
+        }
+        
+        Float OBJ(Float alpha, Eigen::VectorXd& beta)
+        {
+            set(alpha, beta);
+            
+            Float res = 0;
+            
+            for(size_t i = 0; i < _pat.size(); i++)
+            {
+                res += (kernel(_pat[i]) * _p[i]).sum();
+            }
+            
+            return res;
+        }
         
     private:
         // only to be called in init

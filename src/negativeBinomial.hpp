@@ -54,11 +54,13 @@ namespace EBS
         }
         
         
-        void init(std::vector<Float> hyperParam, std::vector<Float> lrate, int UC, Float thre, Float filter)
+        void init(Float alpha, Eigen::VectorXd beta, std::vector<Float> lrate, int UC, Float thre, Float filter)
         {
             assert(UC < _sum.cols());
             
-            _hp = hyperParam;
+            _alpha = alpha;
+            
+            _beta = beta;
             
             _lrate = lrate;
             
@@ -149,7 +151,7 @@ namespace EBS
                     
                     Float r2 = n2 * _r(i);
                     
-                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2);
+                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2,i);
                     
                     //                    if(tmp < 1)
                     //                    {
@@ -232,7 +234,7 @@ namespace EBS
         
         
         
-        Float kernel2case(Float& s1, Float& s2, Float& r1, Float& r2, int n1, int n2)
+        Float kernel2case(Float& s1, Float& s2, Float& r1, Float& r2, int n1, int n2, size_t i)
         {
             // if too small mean, assume they are the same
             if(s1 / n1 < _filter && s2 / n2 <_filter )
@@ -240,9 +242,9 @@ namespace EBS
                 return INT_MAX;
             }
             
-            Float alpha = _hp[0];
+            Float alpha = _alpha;
             
-            Float beta = _hp[1];
+            Float beta = _beta(i);
             
             Float res = lbeta(alpha + r1 + r2, beta + s1 + s2) + lbeta(alpha, beta) - lbeta(alpha + r1, beta + s1) - lbeta(alpha + r2, beta + s2);
             
@@ -270,7 +272,14 @@ namespace EBS
         
         typedef decltype(_mean.row(0)) ROW;
         
+        // hyper parameter r can be estimated by MM
         COUNTS _r;
+        
+        // alpha for the beta prior shared by genome, estimated by EM
+        Float _alpha;
+        
+        // beta for the beta prior specified by each gene, estimated by EM
+        Eigen::VectorXd _beta;
         
         COUNTS _csize;
         

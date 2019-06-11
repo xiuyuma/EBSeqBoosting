@@ -42,8 +42,6 @@ namespace EBS
         
     protected:
         
-        std::vector<Float> _hp;
-        
         COUNTS _sum;
         
         CLUSINFO _clusinfo;

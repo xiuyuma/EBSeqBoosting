@@ -251,16 +251,32 @@ namespace EBS
             return res;
         }
         
-        Float kernel(COUNTS& p)
+        COUNTS kernel(COUNTS& p)
         {
-            auto aggregateByClus = _sum * p;
+            _csum = _sum * p;
             
-            auto rByClus = _r * _csize * p;
+            _rsum = _r * _csize * p;
             
+            COUNTS A = (_rsum.array() + _alpha).matrix();
             
+            COUNTS B = _csum.colwise() + _beta;
             
-            return 0;
+            COUNTS res = lbeta(A,B);
+            
+            res = (res.array() - boost::math::lgamma(_alpha)).matrix();
+            
+            res =  res.colwise() - (_beta.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) + (_alpha + _beta.array()).matrix().unaryExpr<Float(*)(Float)>(&boost::math::lgamma));
+            
+            COUNTS RES = res.rowwise().sum();
+            
+            return RES;
+            
         }
+        
+        
+        
+        
+        
         
         void gradientAscent()
         {
@@ -305,6 +321,9 @@ namespace EBS
         
         // vector for DE pattern
         std::vector<std::vector<int>> _dep;
+        
+        // matrices for holding aggregated counts and r in kernel and derivative calculation
+        COUNTS _csum, _rsum;
     };
     
 };

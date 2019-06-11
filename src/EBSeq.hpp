@@ -30,9 +30,9 @@ namespace EBS
         
     protected:
         //on log scale
-        virtual Float kernel(COUNTS& p)
+        virtual COUNTS kernel(COUNTS& p)
         {
-            return 0;
+            return COUNTS();
         }
         
         virtual COUNTS kernelDerivative()

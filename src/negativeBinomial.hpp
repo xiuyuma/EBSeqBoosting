@@ -169,9 +169,6 @@ namespace EBS
         
         COUNTS posterior()
         {
-            
-            kernel();
-            
             assert(abs(_p.sum() - 1) < 0.0001);
             
             Eigen::VectorXd M = _kernel.rowwise().maxCoeff();

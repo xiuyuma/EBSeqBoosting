@@ -34,7 +34,7 @@ namespace EBS
         res = static_cast<NB*>(object)->OBJ(p);
         
         
-        std::cout << "function value " << res << "\n";
+        //std::cout << "function value " << res << "\n";
         
         return res;
         

@@ -10,14 +10,38 @@ namespace EBS
     
     Float wrapperFunc(const std::vector<Float> &param, std::vector<Float> &grad, void *object)
     {
-        Float alpha = param[0];
         
-        Eigen::VectorXd beta(param.size() - 1);
+        std::cout << "called\n";
         
-        for(size_t i = 1; i < param.size(); i++)
-            beta(i - 1) = param[i];
+        Eigen::VectorXd p(param.size() + 1);
         
-        return static_cast<NB*>(object)->OBJ(alpha,beta);
+        Float last = 1;
+        
+        for(size_t i = 0; i < param.size(); i++)
+        {
+            p(i) = param[i];
+            
+            last -= p(i);
+            
+        }
+        
+        p(param.size()) = last;
+        
+        if(last < 0)
+            return  -INT_MAX;
+        
+        return static_cast<NB*>(object)->OBJ(p);
+        
+        
     }
+    
+//    Float myconstraint(const std::vector<Float> &param, std::vector<Float> &grad, void *data)
+//    {
+//        Float res = 0;
+//        for(auto x:param)
+//            res += x;
+//
+//        return res - 1;
+//    }
 
 };

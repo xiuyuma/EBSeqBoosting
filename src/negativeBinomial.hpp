@@ -79,6 +79,8 @@ namespace EBS
             _p.resize(n);
             
             _p.fill(1.0 / n);
+            
+            kernel();
         }
         
         
@@ -113,26 +115,56 @@ namespace EBS
             return A.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) + B.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) - (A + B).unaryExpr<Float(*)(Float)>(&boost::math::lgamma);
         }
     
-        void set(Float alpha, Eigen::VectorXd& beta)
+        void setAlphaBeta(Float alpha, Eigen::VectorXd& beta)
         {
             _alpha = alpha;
             
             _beta = beta;
         }
         
-        Float OBJ(Float alpha, Eigen::VectorXd& beta)
+        void setP(Eigen::VectorXd& p)
         {
-            set(alpha, beta);
-            
-            Float res = 0;
+            _p = p;
+        }
+        
+        
+        void kernel()
+        {
+            _kernel.resize(_sum.rows(),_pat.size());
             
             for(size_t i = 0; i < _pat.size(); i++)
             {
-                res += (kernel(_pat[i]) * _p[i]).sum();
+                COUNTS _csum = _sum * _pat[i];
+                
+                COUNTS _rsum = _r * _csize * _pat[i];
+                
+                COUNTS A = (_rsum.array() + _alpha).matrix();
+                
+                COUNTS B = _csum.colwise() + _beta;
+                
+                COUNTS res = lbeta(A,B);
+                
+                res = (res.array() - boost::math::lgamma(_alpha)).matrix();
+                
+                res =  res.colwise() - (_beta.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) + (_alpha + _beta.array()).matrix().unaryExpr<Float(*)(Float)>(&boost::math::lgamma));
+                
+                _kernel.col(i) = res.rowwise().sum();
+                
             }
             
-            return res;
         }
+        
+        
+        
+        
+        Float OBJ(Eigen::VectorXd& p)
+        {
+            setP(p);
+            
+            return (_kernel * _p).sum();
+        }
+        
+        
         
     private:
         // only to be called in init
@@ -271,32 +303,6 @@ namespace EBS
             return res;
         }
         
-        COUNTS kernel(COUNTS& p)
-        {
-            _csum = _sum * p;
-            
-            _rsum = _r * _csize * p;
-            
-            COUNTS A = (_rsum.array() + _alpha).matrix();
-            
-            COUNTS B = _csum.colwise() + _beta;
-            
-            COUNTS res = lbeta(A,B);
-            
-            res = (res.array() - boost::math::lgamma(_alpha)).matrix();
-            
-            res =  res.colwise() - (_beta.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) + (_alpha + _beta.array()).matrix().unaryExpr<Float(*)(Float)>(&boost::math::lgamma));
-            
-            COUNTS RES = res.rowwise().sum();
-            
-            return RES;
-            
-        }
-        
-        
-        
-        
-        
         
         void gradientAscent()
         {
@@ -342,8 +348,11 @@ namespace EBS
         // vector for DE pattern
         std::vector<std::vector<int>> _dep;
         
-        // matrices for holding aggregated counts and r in kernel and derivative calculation
-        COUNTS _csum, _rsum;
+        // kernel matrix
+        COUNTS _kernel;
+        
+        
+        
     };
     
 };

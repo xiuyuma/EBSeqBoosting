@@ -161,10 +161,31 @@ namespace EBS
         {
             setP(p);
             
-            return (_kernel * _p).sum();
+            return (_kernel * _p).sum() /_p.sum();
         }
         
-        
+        COUNTS posterior()
+        {
+            
+            kernel();
+            
+            assert(abs(_p.sum() - 1) < 0.0001);
+            
+            Eigen::VectorXd M = _kernel.rowwise().maxCoeff();
+            
+            auto posp = _kernel.colwise() - M;
+            
+            posp.unaryExpr<Float(*)(Float)>(& exp);
+            
+            Eigen::VectorXd total = posp * _p;
+            
+            total = (1 / total.array()).matrix();
+            
+            //outer product of total and p
+            COUNTS div = total * _p.transpose();
+            
+            return (posp.array() * div.array()).matrix();
+        }
         
     private:
         // only to be called in init

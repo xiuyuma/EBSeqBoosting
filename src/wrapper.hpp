@@ -10,28 +10,16 @@ namespace EBS
     
     Float wrapperFunc(const std::vector<Float> &param, std::vector<Float> &grad, void *object)
     {
+        Eigen::VectorXd p(param.size());
         
-        std::cout << "called\n";
+        Float res;
+
+        res = static_cast<NB*>(object)->OBJ(p);
         
-        Eigen::VectorXd p(param.size() + 1);
         
-        Float last = 1;
+        std::cout << "function value " << res << "\n";
         
-        for(size_t i = 0; i < param.size(); i++)
-        {
-            p(i) = param[i];
-            
-            last -= p(i);
-            
-        }
-        
-        p(param.size()) = last;
-        
-        if(last < 0)
-            return  -INT_MAX;
-        
-        return static_cast<NB*>(object)->OBJ(p);
-        
+        return res;
         
     }
     

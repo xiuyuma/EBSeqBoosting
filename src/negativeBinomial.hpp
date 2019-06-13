@@ -154,7 +154,10 @@ namespace EBS
             
         }
         
-        
+        COUNTS getKernel()
+        {
+            return _kernel;
+        }
         
         
         Float OBJ(Eigen::VectorXd& p)

@@ -17,6 +17,18 @@ namespace EBS
         
         p = p / p.sum();
         
+        if (!grad.empty())
+        {
+            auto drv = static_cast<NB*>(object)->getKernel().colwise().sum();
+            
+            
+            
+            for(size_t i = 0; i < param.size(); i++)
+            {
+                grad[i] = drv(i);
+            }
+        }
+        
         Float res;
 
         res = static_cast<NB*>(object)->OBJ(p);

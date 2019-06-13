@@ -12,6 +12,11 @@ namespace EBS
     {
         Eigen::VectorXd p(param.size());
         
+        for(size_t i = 0; i < param.size(); i++)
+            p(i) = param[i];
+        
+        p = p / p.sum();
+        
         Float res;
 
         res = static_cast<NB*>(object)->OBJ(p);

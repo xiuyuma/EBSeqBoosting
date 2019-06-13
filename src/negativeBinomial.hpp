@@ -161,7 +161,7 @@ namespace EBS
         {
             setP(p);
             
-            return (_kernel * _p).sum() /_p.sum();
+            return (_kernel * _p).sum();
         }
         
         COUNTS posterior()

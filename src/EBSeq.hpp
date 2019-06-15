@@ -28,6 +28,11 @@ namespace EBS
             return 0;
         }
         
+        COUNTS getSUM()
+        {
+            return _sum;
+        }
+        
     protected:
         //on log scale
         virtual COUNTS kernel(COUNTS& p)

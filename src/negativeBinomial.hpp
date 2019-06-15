@@ -104,6 +104,10 @@ namespace EBS
             return _pat;
         }
         
+        COUNTS getMEAN()
+        {
+            return _mean;
+        }
         
         inline Float lbeta(Float x,Float y)
         {
@@ -173,9 +177,9 @@ namespace EBS
             
             Eigen::VectorXd M = _kernel.rowwise().maxCoeff();
             
-            auto posp = _kernel.colwise() - M;
+            auto rmMax = _kernel.colwise() - M;
             
-            posp.unaryExpr<Float(*)(Float)>(& exp);
+            auto posp = rmMax.unaryExpr<Float(*)(Float)>(& exp);
             
             Eigen::VectorXd total = posp * _p;
             
@@ -247,6 +251,7 @@ namespace EBS
                     
                 }
                 
+                
                 auto tmpOrd = helper::sortIndexes<std::vector<Float>>(abslogRatio);
                 
                 auto baseBit = partition::mapToBit(baseClus);
@@ -261,6 +266,31 @@ namespace EBS
                 _guc.push_back(localUC);
                 
                 localUC = std::min(localUC , _uncertainty);
+                
+                if(localUC < 1)
+                {
+                    auto newClus = partition::bitToPart(baseBit);
+                    
+                    auto newClusOr = newClus;
+                    
+                    for(size_t iter = 0; iter < ord2.size(); iter++)
+                    {
+                        newClusOr[iter] = newClus[ord2[iter]];
+                    }
+                    
+                    auto newClusOrd = partition::reorder(newClusOr);
+                    
+                    auto sClus = partition::toString<std::vector<int>>(newClusOrd);
+                    
+                    if(dep.find(sClus) == dep.end())
+                    {
+                        dep.insert(sClus);
+                        
+                        _dep.push_back(newClusOrd);
+                        
+                        _pat.push_back(partition::toMatrix(newClusOrd));
+                    }
+                }
                 
                 auto pBit = partition::genBit(localUC);
                 

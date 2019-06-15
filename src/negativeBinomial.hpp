@@ -80,6 +80,10 @@ namespace EBS
             
             _p.fill(1.0 / n);
             
+            // adjust dim of kernel matrix
+            _kernel.resize(_sum.rows(),_pat.size());
+            
+            // init kernel matrix, prior predictive function at each gene, under each DE pattern
             kernel();
         }
         
@@ -134,7 +138,6 @@ namespace EBS
         
         void kernel()
         {
-            _kernel.resize(_sum.rows(),_pat.size());
             
             for(size_t i = 0; i < _pat.size(); i++)
             {

@@ -269,13 +269,13 @@ namespace EBS
                 
                 if(localUC < 1)
                 {
-                    auto newClus = partition::bitToPart(baseBit);
+                    //auto newClus = partition::bitToPart(baseBit);
                     
-                    auto newClusOr = newClus;
+                    auto newClusOr = baseClus;
                     
                     for(size_t iter = 0; iter < ord2.size(); iter++)
                     {
-                        newClusOr[iter] = newClus[ord2[iter]];
+                        newClusOr[iter] = baseClus[ord2[iter]];
                     }
                     
                     auto newClusOrd = partition::reorder(newClusOr);

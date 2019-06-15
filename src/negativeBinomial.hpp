@@ -56,26 +56,36 @@ namespace EBS
         
         void init(Float alpha, Eigen::VectorXd beta, std::vector<Float> lrate, int UC, Float thre, Float filter)
         {
+            // uncertatinty should be smaller than number of subtypes - 1 (number of in/equalities)
             assert(UC < _sum.cols());
             
+            // scalar of alpha for beta prior, shared by genome
             _alpha = alpha;
             
+            // vector of beta for beta prior, gene specific
             _beta = beta;
             
+            // stepsize of gradient updates for alpha and beta
             _lrate = lrate;
             
+            // number of uncertatinty of in/equalities between subtypes
             _uncertainty = UC;
             
+            // threshold for distinguish certain and uncertain
             _threshold = thre;
             
+            // filter threshold for low expression subtypes
             _filter = filter;
             
+            // get promising DE pattern
             DEpat();
             
+            // error checking, number of promising DE patterns must > 0
             size_t n = _dep.size();
             
             assert(n > 0);
             
+            // inita prop for each DE pattern with equal proportion
             _p.resize(n);
             
             _p.fill(1.0 / n);
@@ -231,15 +241,10 @@ namespace EBS
                     
                     Float r2 = n2 * _r(i);
                     
+                    // ratio of EE and DE prior predictive functions
                     Float tmp = kernel2case(s1,s2,r1,r2,n1,n2,i);
                     
-                    //                    if(tmp < 1)
-                    //                    {
-                    //                        std::cout << "i " << i <<"," << s1 << "," << s2 << "," << r1 << "," << r2 << "\n";
-                    //                    }
-                    
                     abslogRatio[j - 1] = abs(tmp);
-                    
                     
                     //  more favorable for equal mean
                     if(tmp > 0)

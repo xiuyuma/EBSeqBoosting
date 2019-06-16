@@ -169,13 +169,17 @@ namespace EBS
         
         void oneRunUpdate(Eigen::VectorXd P)
         {
-            // first given alpha beta and dep, find optimal p
+            // first given alpha beta and dep, find optimal p and update mde
             setP(P);
+            
+            updateMDE();
             
             // then given p and dep update alpha and beta
             gradientAscent();
             
             // finally given p, alpha and beta update dep
+            _dep.clear();
+            
             DEpat();
             
         }

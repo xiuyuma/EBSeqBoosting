@@ -180,6 +180,8 @@ namespace EBS
             // finally given p, alpha and beta update dep
             _dep.clear();
             
+            _pat.clear();
+            
             DEpat();
         }
         

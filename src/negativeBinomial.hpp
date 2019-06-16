@@ -4,6 +4,7 @@
 #include "EBSeq.hpp"
 #include <cmath>
 #include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/special_functions/digamma.hpp>
 #include <set>
 
 namespace EBS
@@ -90,9 +91,6 @@ namespace EBS
             
             _p.fill(1.0 / n);
             
-            // adjust dim of kernel matrix
-            _kernel.resize(_sum.rows(),_pat.size());
-            
             // init kernel matrix, prior predictive function at each gene, under each DE pattern
             kernel();
         }
@@ -143,32 +141,6 @@ namespace EBS
         void setP(Eigen::VectorXd& p)
         {
             _p = p;
-        }
-        
-        
-        void kernel()
-        {
-            
-            for(size_t i = 0; i < _pat.size(); i++)
-            {
-                COUNTS _csum = _sum * _pat[i];
-                
-                COUNTS _rsum = _r * _csize * _pat[i];
-                
-                COUNTS A = (_rsum.array() + _alpha).matrix();
-                
-                COUNTS B = _csum.colwise() + _beta;
-                
-                COUNTS res = lbeta(A,B);
-                
-                res = (res.array() - boost::math::lgamma(_alpha)).matrix();
-                
-                res =  res.colwise() - (_beta.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) + (_alpha + _beta.array()).matrix().unaryExpr<Float(*)(Float)>(&boost::math::lgamma));
-                
-                _kernel.col(i) = res.rowwise().sum();
-                
-            }
-            
         }
         
         COUNTS getKernel()
@@ -277,7 +249,6 @@ namespace EBS
                 
                 if(localUC < 1)
                 {
-                    //auto newClus = partition::bitToPart(baseBit);
                     
                     auto newClusOr = baseClus;
                     
@@ -362,12 +333,92 @@ namespace EBS
             return res;
         }
         
-        
-        void gradientAscent()
+        void kernel()
         {
+            // adjust dim of kernel matrix
+            _kernel.resize(_sum.rows(),_pat.size());
+            
+            for(size_t i = 0; i < _pat.size(); i++)
+            {
+                COUNTS _csum = _sum * _pat[i];
+                
+                COUNTS _rsum = _r * _csize * _pat[i];
+                
+                COUNTS A = (_rsum.array() + _alpha).matrix();
+                
+                COUNTS B = _csum.colwise() + _beta;
+                
+                COUNTS res = lbeta(A,B);
+                
+                res = (res.array() - boost::math::lgamma(_alpha)).matrix();
+                
+                res =  res.colwise() - (_beta.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) + (_alpha + _beta.array()).matrix().unaryExpr<Float(*)(Float)>(&boost::math::lgamma));
+                
+                _kernel.col(i) = res.rowwise().sum();
+                
+            }
             
         }
         
+        void gradientAscent()
+        {
+            size_t G = _sum.rows();
+
+            size_t npat = _pat.size();
+
+            COUNTS alpDRV(G,npat);
+
+            COUNTS betaDRV(G,npat);
+
+            for(size_t i = 0; i < npat; i++)
+            {
+                COUNTS _csum = _sum * _pat[i];
+
+                COUNTS _rsum = _r * _csize * _pat[i];
+
+                COUNTS A = (_rsum.array() + _alpha).matrix();
+
+                COUNTS B = _csum.colwise() + _beta;
+
+                COUNTS C = (A + B).unaryExpr<Float(*)(Float)>(&(boost::math::digamma));
+
+                Eigen::VectorXd D = (_alpha + _beta.array()).matrix().unaryExpr<Float(*)(Float)>(&(boost::math::digamma));
+
+                COUNTS resAlpha = ((A.unaryExpr<Float(*)(Float)>(&(boost::math::digamma)) - C).array() - boost::math::digamma(_alpha)).matrix();
+
+                resAlpha = resAlpha.colwise() + D;
+
+                COUNTS resBeta = B.unaryExpr<Float(*)(Float)>(&(boost::math::digamma)) - C;
+
+                resBeta = resBeta.colwise() - (_beta.unaryExpr<Float(*)(Float)>(&(boost::math::digamma)) + D);
+
+                alpDRV.col(i) = resAlpha.rowwise().sum();
+
+                betaDRV.col(i) = resBeta.rowwise().sum();
+            }
+
+            auto tmp1 = _alpha + _lrate[0] * (alpDRV * _p).sum();
+
+            auto tmp2 = _beta + _lrate[1] * (betaDRV * _p);
+
+            // check validity
+            if(tmp1 > 0)
+                _alpha = tmp1;
+
+            for(size_t i = 0; i < G; i++)
+            {
+                if(tmp2[i] > 0)
+                {
+                    _beta[i] = tmp2[i];
+                }
+            }
+        }
+        
+        
+        void updateDEP()
+        {
+            
+        }
         
     private:
         

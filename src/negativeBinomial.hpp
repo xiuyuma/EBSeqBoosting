@@ -159,7 +159,15 @@ namespace EBS
             return _mde;
         }
         
+        Float getALP()
+        {
+            return _alpha;
+        }
         
+        Eigen::VectorXd getBETA()
+        {
+            return _beta;
+        }
         Float OBJ(Eigen::VectorXd& p)
         {
             setP(p);
@@ -167,11 +175,8 @@ namespace EBS
             return (_kernel * _p).sum();
         }
         
-        void oneRunUpdate(Eigen::VectorXd P)
+        void oneRunUpdate()
         {
-            // first given alpha beta and dep, find optimal p and update mde
-            setP(P);
-            
             //updateMDE();
             
             // then given p and dep update alpha and beta

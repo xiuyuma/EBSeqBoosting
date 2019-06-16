@@ -182,6 +182,17 @@ namespace EBS
             
             DEpat();
             
+            // error checking, number of promising DE patterns must > 0
+            size_t n = _dep.size();
+            
+            assert(n > 0);
+            
+            // inita prop for each DE pattern with equal proportion
+            _p.resize(n);
+            
+            _p.fill(1.0 / n);
+            
+            kernel();
         }
         
         

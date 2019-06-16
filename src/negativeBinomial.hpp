@@ -177,16 +177,17 @@ namespace EBS
             // then given p and dep update alpha and beta
             gradientAscent();
             
+        }
+        
+        void oneRunUpdate2()
+        {
             // finally given p, alpha and beta update dep
             _dep.clear();
             
             _pat.clear();
             
             DEpat();
-        }
-        
-        void oneRunUpdate2()
-        {
+            
             // error checking, number of promising DE patterns must > 0
             size_t n = _dep.size();
             

@@ -6,6 +6,7 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <set>
+#include <nlopt.hpp>
 
 namespace EBS
 {
@@ -78,6 +79,11 @@ namespace EBS
             // filter threshold for low expression subtypes
             _filter = filter;
             
+            // resize mde matrix as K by K
+            _mde.resize(_sum.cols(),_sum.cols());
+            
+            _mde.fill(1.0 / 2);
+            
             // get promising DE pattern
             DEpat();
             
@@ -148,6 +154,11 @@ namespace EBS
             return _kernel;
         }
         
+        COUNTS getMDE()
+        {
+            return _mde;
+        }
+        
         
         Float OBJ(Eigen::VectorXd& p)
         {
@@ -155,6 +166,20 @@ namespace EBS
             
             return (_kernel * _p).sum();
         }
+        
+        void oneRunUpdate(Eigen::VectorXd P)
+        {
+            // first given alpha beta and dep, find optimal p
+            setP(P);
+            
+            // then given p and dep update alpha and beta
+            gradientAscent();
+            
+            // finally given p, alpha and beta update dep
+            DEpat();
+            
+        }
+        
         
         COUNTS posterior()
         {
@@ -175,6 +200,8 @@ namespace EBS
             
             return (posp.array() * div.array()).matrix();
         }
+        
+        
         
     private:
         // only to be called in init
@@ -201,20 +228,34 @@ namespace EBS
                 
                 for(size_t j = 1; j < K; j++)
                 {
-                    Float s1 = _sum(i,ord[j - 1]);
+                    // position for j-1th and jth subtypes
+                    auto o1 = ord[j - 1];
                     
-                    Float s2 = _sum(i,ord[j]);
+                    auto o2 = ord[j];
                     
-                    int n1 = _clusinfo.size[ord[j - 1]];
+                    Float s1 = _sum(i,o1);
                     
-                    int n2 = _clusinfo.size[ord[j]];
+                    Float s2 = _sum(i,o2);
+                    
+                    int n1 = _clusinfo.size[o1];
+                    
+                    int n2 = _clusinfo.size[o2];
                     
                     Float r1 = n1 * _r(i);
                     
                     Float r2 = n2 * _r(i);
                     
                     // ratio of EE and DE prior predictive functions
-                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2,i);
+                    Float use, marginal;
+                    
+                    if(o1 < o2)
+                        use = _mde(o1,o2);
+                    else
+                        use = _mde(o2,o1);
+                    
+                    marginal = use / (1 - use);
+                    
+                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2,i) + log(marginal);
                     
                     abslogRatio[j - 1] = abs(tmp);
                     
@@ -414,11 +455,26 @@ namespace EBS
             }
         }
         
-        
-        void updateDEP()
+        void updateMDE()
         {
+            _mde.fill(0);
             
+            size_t K = _sum.cols();
+            
+            for(size_t i = 0; i < K; i++)
+            {
+                for(size_t j = i; j < K; j++)
+                {
+                    for(size_t p = 0; p < _dep.size(); p++)
+                    {
+                        if(_dep[p][i] == _dep[p][j])
+                            _mde(i,j) += _p[p];
+                    }
+                }
+            }
         }
+        
+        
         
     private:
         
@@ -461,7 +517,8 @@ namespace EBS
         // kernel matrix
         COUNTS _kernel;
         
-        
+        // marginal for two subtypes being ED or DD
+        COUNTS _mde;
         
     };
     

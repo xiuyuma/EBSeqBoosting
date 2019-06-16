@@ -167,7 +167,7 @@ namespace EBS
             return (_kernel * _p).sum();
         }
         
-        void oneRunUpdate(Eigen::VectorXd P)
+        void oneRunUpdate1(Eigen::VectorXd P)
         {
             // first given alpha beta and dep, find optimal p and update mde
             setP(P);
@@ -181,7 +181,10 @@ namespace EBS
             _dep.clear();
             
             DEpat();
-            
+        }
+        
+        void oneRunUpdate2()
+        {
             // error checking, number of promising DE patterns must > 0
             size_t n = _dep.size();
             
@@ -192,9 +195,9 @@ namespace EBS
             
             _p.fill(1.0 / n);
             
+            // init kernel matrix, prior predictive function at each gene, under each DE pattern
             kernel();
         }
-        
         
         COUNTS posterior()
         {

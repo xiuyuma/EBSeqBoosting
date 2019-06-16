@@ -167,40 +167,41 @@ namespace EBS
             return (_kernel * _p).sum();
         }
         
-        void oneRunUpdate1(Eigen::VectorXd P)
+        void oneRunUpdate(Eigen::VectorXd P)
         {
             // first given alpha beta and dep, find optimal p and update mde
             setP(P);
             
-            updateMDE();
+            //updateMDE();
             
             // then given p and dep update alpha and beta
             gradientAscent();
             
-        }
-        
-        void oneRunUpdate2()
-        {
-            // finally given p, alpha and beta update dep
-            _dep.clear();
-            
-            _pat.clear();
-            
-            DEpat();
-            
-            // error checking, number of promising DE patterns must > 0
-            size_t n = _dep.size();
-            
-            assert(n > 0);
-            
-            // inita prop for each DE pattern with equal proportion
-            _p.resize(n);
-            
-            _p.fill(1.0 / n);
-            
-            // init kernel matrix, prior predictive function at each gene, under each DE pattern
             kernel();
         }
+        
+//        void oneRunUpdate2()
+//        {
+//            // finally given p, alpha and beta update dep
+//            _dep.clear();
+//
+//            _pat.clear();
+//
+//            DEpat();
+//
+//            // error checking, number of promising DE patterns must > 0
+//            size_t n = _dep.size();
+//
+//            assert(n > 0);
+//
+//            // inita prop for each DE pattern with equal proportion
+//            _p.resize(n);
+//
+//            _p.fill(1.0 / n);
+//
+//            // init kernel matrix, prior predictive function at each gene, under each DE pattern
+//            kernel();
+//        }
         
         COUNTS posterior()
         {
@@ -489,8 +490,11 @@ namespace EBS
                     for(size_t p = 0; p < _dep.size(); p++)
                     {
                         if(_dep[p][i] == _dep[p][j])
+                        {
                             _mde(i,j) += _p[p];
+                        }
                     }
+                    
                 }
             }
         }

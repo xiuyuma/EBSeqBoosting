@@ -519,6 +519,7 @@ namespace EBS
         // beta for the beta prior specified by each gene, estimated by EM
         Eigen::VectorXd _beta;
         
+        // size of each cluster, vector of dim K by 1, used for product of r.
         COUNTS _csize;
         
         std::vector<Float> _lrate;

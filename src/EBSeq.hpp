@@ -97,7 +97,7 @@ namespace EBS
         virtual void Mstep() = 0;
         
         // get value of objective function
-        virtual Float getOBJ()=0;
+        virtual Float getOBJ() = 0;
         
         
     protected:

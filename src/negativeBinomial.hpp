@@ -225,6 +225,11 @@ namespace EBS
             return _post;
         }
         
+        Float getOBJ()
+        {
+            return OBJ(_p);
+        }
+        
         void setAlphaBeta(Float alpha, Eigen::VectorXd& beta)
         {
             _alpha = alpha;

@@ -131,26 +131,6 @@ namespace EBS
 //        }
         
         
-        void posterior()
-        {
-            assert(abs(_p.sum() - 1) < 0.0001);
-            
-            Eigen::VectorXd M = _kernel.rowwise().maxCoeff();
-            
-            auto rmMax = _kernel.colwise() - M;
-            
-            _post = rmMax.unaryExpr<Float(*)(Float)>(& exp);
-            
-            Eigen::VectorXd total = _post * _p;
-            
-            total = (1 / total.array()).matrix();
-            
-            //outer product of total and p
-            COUNTS div = total * _p.transpose();
-            
-            _post = (_post.array() * div.array()).matrix();
-        }
-        
         size_t DEPsize()
         {
             return _dep.size();
@@ -486,6 +466,26 @@ namespace EBS
                     _beta[i] = tmp2[i];
                 }
             }
+        }
+        
+        void posterior()
+        {
+            assert(abs(_p.sum() - 1) < 0.0001);
+            
+            Eigen::VectorXd M = _kernel.rowwise().maxCoeff();
+            
+            auto rmMax = _kernel.colwise() - M;
+            
+            _post = rmMax.unaryExpr<Float(*)(Float)>(& exp);
+            
+            Eigen::VectorXd total = _post * _p;
+            
+            total = (1 / total.array()).matrix();
+            
+            //outer product of total and p
+            COUNTS div = total * _p.transpose();
+            
+            _post = (_post.array() * div.array()).matrix();
         }
         
         void updateP()

@@ -101,6 +101,79 @@ namespace EBS
             kernel();
         }
         
+        inline Float lbeta(Float x,Float y)
+        {
+            return boost::math::lgamma(x) + boost::math::lgamma(y) - boost::math::lgamma(x + y);
+        }
+        
+        inline COUNTS lbeta(COUNTS& A, COUNTS& B)
+        {
+            return A.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) + B.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) - (A + B).unaryExpr<Float(*)(Float)>(&boost::math::lgamma);
+        }
+    
+        Float OBJ(Eigen::VectorXd& p)
+        {
+            setP(p);
+            
+            return (_kernel * _p).sum();
+        }
+        
+        void oneRunUpdate()
+        {
+            //updateMDE();
+            
+            // then given p and dep update alpha and beta
+            gradientAscent();
+            
+            kernel();
+            
+            posterior();
+            
+            updateP();
+        }
+        
+//        void oneRunUpdate2()
+//        {
+//            // finally given p, alpha and beta update dep
+//            _dep.clear();
+//
+//            _pat.clear();
+//
+//            DEpat();
+//
+//            // error checking, number of promising DE patterns must > 0
+//            size_t n = _dep.size();
+//
+//            assert(n > 0);
+//
+//            // inita prop for each DE pattern with equal proportion
+//            _p.resize(n);
+//
+//            _p.fill(1.0 / n);
+//
+//            // init kernel matrix, prior predictive function at each gene, under each DE pattern
+//            kernel();
+//        }
+        
+        void posterior()
+        {
+            assert(abs(_p.sum() - 1) < 0.0001);
+            
+            Eigen::VectorXd M = _kernel.rowwise().maxCoeff();
+            
+            auto rmMax = _kernel.colwise() - M;
+            
+            _post = rmMax.unaryExpr<Float(*)(Float)>(& exp);
+            
+            Eigen::VectorXd total = _post * _p;
+            
+            total = (1 / total.array()).matrix();
+            
+            //outer product of total and p
+            COUNTS div = total * _p.transpose();
+            
+            _post = (_post.array() * div.array()).matrix();
+        }
         
         size_t DEPsize()
         {
@@ -127,28 +200,6 @@ namespace EBS
             return _mean;
         }
         
-        inline Float lbeta(Float x,Float y)
-        {
-            return boost::math::lgamma(x) + boost::math::lgamma(y) - boost::math::lgamma(x + y);
-        }
-        
-        inline COUNTS lbeta(COUNTS& A, COUNTS& B)
-        {
-            return A.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) + B.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) - (A + B).unaryExpr<Float(*)(Float)>(&boost::math::lgamma);
-        }
-    
-        void setAlphaBeta(Float alpha, Eigen::VectorXd& beta)
-        {
-            _alpha = alpha;
-            
-            _beta = beta;
-        }
-        
-        void setP(Eigen::VectorXd& p)
-        {
-            _p = p;
-        }
-        
         COUNTS getKernel()
         {
             return _kernel;
@@ -168,67 +219,23 @@ namespace EBS
         {
             return _beta;
         }
-        Float OBJ(Eigen::VectorXd& p)
+        
+        COUNTS getPOSP()
         {
-            setP(p);
-            
-            return (_kernel * _p).sum();
+            return _post;
         }
         
-        void oneRunUpdate()
+        void setAlphaBeta(Float alpha, Eigen::VectorXd& beta)
         {
-            //updateMDE();
+            _alpha = alpha;
             
-            // then given p and dep update alpha and beta
-            gradientAscent();
-            
-            kernel();
+            _beta = beta;
         }
         
-//        void oneRunUpdate2()
-//        {
-//            // finally given p, alpha and beta update dep
-//            _dep.clear();
-//
-//            _pat.clear();
-//
-//            DEpat();
-//
-//            // error checking, number of promising DE patterns must > 0
-//            size_t n = _dep.size();
-//
-//            assert(n > 0);
-//
-//            // inita prop for each DE pattern with equal proportion
-//            _p.resize(n);
-//
-//            _p.fill(1.0 / n);
-//
-//            // init kernel matrix, prior predictive function at each gene, under each DE pattern
-//            kernel();
-//        }
-        
-        COUNTS posterior()
+        void setP(Eigen::VectorXd& p)
         {
-            assert(abs(_p.sum() - 1) < 0.0001);
-            
-            Eigen::VectorXd M = _kernel.rowwise().maxCoeff();
-            
-            auto rmMax = _kernel.colwise() - M;
-            
-            auto posp = rmMax.unaryExpr<Float(*)(Float)>(& exp);
-            
-            Eigen::VectorXd total = posp * _p;
-            
-            total = (1 / total.array()).matrix();
-            
-            //outer product of total and p
-            COUNTS div = total * _p.transpose();
-            
-            return (posp.array() * div.array()).matrix();
+            _p = p;
         }
-        
-        
         
     private:
         // only to be called in init
@@ -482,6 +489,11 @@ namespace EBS
             }
         }
         
+        void updateP()
+        {
+            _p = _post.colwise().sum() / _post.sum();
+        }
+        
         void updateMDE()
         {
             _mde.fill(0);
@@ -550,6 +562,9 @@ namespace EBS
         
         // marginal for two subtypes being ED or DD
         COUNTS _mde;
+        
+        // posterior prob
+        COUNTS _post;
         
     };
     

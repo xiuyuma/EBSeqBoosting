@@ -69,6 +69,7 @@ namespace EBS
                 
                 changeRatio = abs(changeRatio);
                 
+                Iter++;
             }
         }
         

@@ -71,6 +71,8 @@ namespace EBS
                 
                 changeRatio = abs(changeRatio);
                 
+                lastOBJ = getOBJ();
+                
                 std::cout << "OBJ " << lastOBJ << "\n";
                 
                 Iter++;

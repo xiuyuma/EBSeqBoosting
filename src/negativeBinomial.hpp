@@ -96,6 +96,7 @@ namespace EBS
             _p.resize(n);
             
             _p.fill(1.0 / n);
+            
         }
         
         inline Float lbeta(Float x,Float y)
@@ -469,11 +470,10 @@ namespace EBS
                 betaDRV.col(i) = resBeta.rowwise().sum();
             }
 
-            //auto tmp1 = _alpha + _lrate[0] * (alpDRV * _p).sum();
-            auto tmp1 = _alpha + _lrate[0] * (alpDRV.array() * _post.array()).matrix().sum();
+            auto tmp1 = _alpha + _lrate[0] * (alpDRV * _p).sum();
             
-            //auto tmp2 = _beta + _lrate[1] * (betaDRV * _p);
-            auto tmp2 = _beta + _lrate[1] * (betaDRV.array() * _post.array()).matrix().rowwise().sum();
+            auto tmp2 = _beta + _lrate[1] * (betaDRV * _p);
+            //auto tmp2 = _beta + _lrate[1] * (betaDRV.array() * _post.array()).matrix().rowwise().sum();
             
             // check validity
             if(tmp1 > 0)

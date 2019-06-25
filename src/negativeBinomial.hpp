@@ -471,11 +471,10 @@ namespace EBS
 
             //auto tmp1 = _alpha + _lrate[0] * (alpDRV * _p).sum();
             auto tmp1 = _alpha + _lrate[0] * (alpDRV.array() * _post.array()).sum();
-
-            //auto tmp2 = _beta + _lrate[1] * (betaDRV * _p);
-            auto tmp2 = _beta + _lrate[1] * (betaDRV.array() * _post.array()).matrix();
             
-            std::cout << betaDRV * _p;
+            //auto tmp2 = _beta + _lrate[1] * (betaDRV * _p);
+            auto tmp2 = _beta + _lrate[1] * (betaDRV.array() * _post.array()).matrix().rowwise().sum();
+            
             // check validity
             if(tmp1 > 0)
                 _alpha = tmp1;

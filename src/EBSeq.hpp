@@ -12,7 +12,6 @@ namespace EBS
     {
         
     public:
-        virtual void gradientAscent(){};
          
         EBSeq(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster)
         {
@@ -81,6 +80,9 @@ namespace EBS
         
         
     protected:
+        
+        // for one step EM
+        virtual void gradientAscent(){};
         
         // matrix for prior predictive scores under different DE patterns
         virtual void kernel() = 0;

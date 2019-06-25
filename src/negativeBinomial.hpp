@@ -80,9 +80,9 @@ namespace EBS
             _filter = filter;
             
             // resize mde matrix as K by K
-            _mde.resize(_sum.cols(),_sum.cols());
+            //_mde.resize(_sum.cols(),_sum.cols());
             
-            _mde.fill(1.0 / 2);
+            //_mde.fill(1.0 / 2);
             
             // get promising DE pattern
             DEpat();
@@ -96,9 +96,6 @@ namespace EBS
             _p.resize(n);
             
             _p.fill(1.0 / n);
-            
-            // init kernel matrix, prior predictive function at each gene, under each DE pattern
-            kernel();
         }
         
         inline Float lbeta(Float x,Float y)
@@ -118,42 +115,20 @@ namespace EBS
             return (_kernel * _p).sum();
         }
         
-        void oneRunUpdate()
-        {
-            //updateMDE();
-            
-            // then given p and dep update alpha and beta
-            gradientAscent();
-            
-            kernel();
-            
-            posterior();
-            
-            updateP();
-        }
-        
-//        void oneRunUpdate2()
+//        void oneRunUpdate()
 //        {
-//            // finally given p, alpha and beta update dep
-//            _dep.clear();
+//            //updateMDE();
 //
-//            _pat.clear();
+//            // then given p and dep update alpha and beta
+//            gradientAscent();
 //
-//            DEpat();
-//
-//            // error checking, number of promising DE patterns must > 0
-//            size_t n = _dep.size();
-//
-//            assert(n > 0);
-//
-//            // inita prop for each DE pattern with equal proportion
-//            _p.resize(n);
-//
-//            _p.fill(1.0 / n);
-//
-//            // init kernel matrix, prior predictive function at each gene, under each DE pattern
 //            kernel();
+//
+//            posterior();
+//
+//            updateP();
 //        }
+        
         
         void posterior()
         {
@@ -195,20 +170,16 @@ namespace EBS
             return _pat;
         }
         
-        COUNTS getMEAN()
-        {
-            return _mean;
-        }
         
         COUNTS getKernel()
         {
             return _kernel;
         }
         
-        COUNTS getMDE()
-        {
-            return _mde;
-        }
+//        COUNTS getMDE()
+//        {
+//            return _mde;
+//        }
         
         Float getALP()
         {
@@ -243,6 +214,25 @@ namespace EBS
         }
         
     private:
+        
+        void Estep()
+        {
+            // update kernel given alpha and beta
+            kernel();
+            
+            // update posterior with p
+            posterior();
+        }
+        
+        void Mstep()
+        {
+            // update alpha and beta
+            gradientAscent();
+            
+            // update p
+            updateP();
+        }
+        
         // only to be called in init
         void DEpat()
         {
@@ -285,16 +275,18 @@ namespace EBS
                     Float r2 = n2 * _r(i);
                     
                     // ratio of EE and DE prior predictive functions
-                    Float use, marginal;
+//                    Float use, marginal;
+//
+//                    if(o1 < o2)
+//                        use = _mde(o1,o2);
+//                    else
+//                        use = _mde(o2,o1);
                     
-                    if(o1 < o2)
-                        use = _mde(o1,o2);
-                    else
-                        use = _mde(o2,o1);
+//                    marginal = use / (1 - use);
                     
-                    marginal = use / (1 - use);
+//                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2,i) + log(marginal);
                     
-                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2,i) + log(marginal);
+                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2,i);
                     
                     abslogRatio[j - 1] = abs(tmp);
                     
@@ -477,10 +469,13 @@ namespace EBS
                 betaDRV.col(i) = resBeta.rowwise().sum();
             }
 
-            auto tmp1 = _alpha + _lrate[0] * (alpDRV * _p).sum();
+            //auto tmp1 = _alpha + _lrate[0] * (alpDRV * _p).sum();
+            auto tmp1 = _alpha + _lrate[0] * (alpDRV.array() * _post.array()).sum();
 
-            auto tmp2 = _beta + _lrate[1] * (betaDRV * _p);
-
+            //auto tmp2 = _beta + _lrate[1] * (betaDRV * _p);
+            auto tmp2 = _beta + _lrate[1] * (betaDRV.array() * _post.array()).matrix();
+            
+            std::cout << betaDRV * _p;
             // check validity
             if(tmp1 > 0)
                 _alpha = tmp1;
@@ -499,27 +494,27 @@ namespace EBS
             _p = _post.colwise().sum() / _post.sum();
         }
         
-        void updateMDE()
-        {
-            _mde.fill(0);
-            
-            size_t K = _sum.cols();
-            
-            for(size_t i = 0; i < K; i++)
-            {
-                for(size_t j = i; j < K; j++)
-                {
-                    for(size_t p = 0; p < _dep.size(); p++)
-                    {
-                        if(_dep[p][i] == _dep[p][j])
-                        {
-                            _mde(i,j) += _p[p];
-                        }
-                    }
-                    
-                }
-            }
-        }
+//        void updateMDE()
+//        {
+//            _mde.fill(0);
+//
+//            size_t K = _sum.cols();
+//
+//            for(size_t i = 0; i < K; i++)
+//            {
+//                for(size_t j = i; j < K; j++)
+//                {
+//                    for(size_t p = 0; p < _dep.size(); p++)
+//                    {
+//                        if(_dep[p][i] == _dep[p][j])
+//                        {
+//                            _mde(i,j) += _p[p];
+//                        }
+//                    }
+//
+//                }
+//            }
+//        }
         
         
         
@@ -566,7 +561,7 @@ namespace EBS
         COUNTS _kernel;
         
         // marginal for two subtypes being ED or DD
-        COUNTS _mde;
+//        COUNTS _mde;
         
         // posterior prob
         COUNTS _post;

@@ -23,27 +23,73 @@ namespace EBS
             _mean = aggregate::groupMean(scRNAexpMatrix, _clusinfo);
         }
         
-        virtual Float LogLikelihood()
-        {
-            return 0;
-        }
+        
         
         COUNTS getSUM()
         {
             return _sum;
         }
         
-    protected:
-        //on log scale
-        virtual COUNTS kernel(COUNTS& p)
+        COUNTS getMEAN()
         {
-            return COUNTS();
+            return _mean;
         }
         
-        virtual COUNTS kernelDerivative()
+        // get the posterior probability
+        virtual COUNTS getPOSP() = 0;
+        
+        void EM(size_t max_iteration, Float changeThre)
         {
-            return COUNTS();
+            size_t Iter = 0;
+            
+            Float changeRatio = 10;
+            
+            Float lastOBJ;
+            
+            bool first = true;
+            
+            while(Iter < max_iteration && changeRatio > changeThre)
+            {
+                Estep();
+                
+                Mstep();
+                
+                if(first)
+                {
+                    lastOBJ = getOBJ();
+                    
+                    Iter++;
+                    
+                    first = false;
+                    
+                    continue;
+                }
+                
+                changeRatio = (getOBJ() - lastOBJ) / lastOBJ;
+                
+                changeRatio = abs(changeRatio);
+                
+            }
         }
+        
+        
+    protected:
+        
+        // matrix for prior predictive scores under different DE patterns
+        virtual void kernel() = 0;
+        
+        // function to find more probable DE patterns
+        virtual void DEpat() = 0;
+        
+        // E - step of EM
+        virtual void Estep() = 0;
+        
+        // M - step of EM
+        virtual void Mstep() = 0;
+        
+        // get value of objective function
+        virtual Float getOBJ()=0;
+        
         
     protected:
         
@@ -52,6 +98,7 @@ namespace EBS
         CLUSINFO _clusinfo;
         
         COUNTS _mean;
+        
     };
 
 };

@@ -62,12 +62,16 @@ namespace EBS
                     
                     first = false;
                     
+                    std::cout << "OBJ " << lastOBJ << "\n";
+                    
                     continue;
                 }
                 
                 changeRatio = (getOBJ() - lastOBJ) / lastOBJ;
                 
                 changeRatio = abs(changeRatio);
+                
+                std::cout << "OBJ " << lastOBJ << "\n";
                 
                 Iter++;
             }

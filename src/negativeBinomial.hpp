@@ -172,7 +172,7 @@ namespace EBS
             return _beta;
         }
         
-        COUNTS getPOSP()
+        COUNTS getPOST()
         {
             return _post;
         }

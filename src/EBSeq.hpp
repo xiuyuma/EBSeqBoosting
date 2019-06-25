@@ -35,7 +35,7 @@ namespace EBS
         }
         
         // get the posterior probability
-        virtual COUNTS getPOSP() = 0;
+        virtual COUNTS getPOST() = 0;
         
         void EM(size_t max_iteration, Float changeThre)
         {

@@ -142,8 +142,6 @@ namespace EBS
             
             std::vector<int> res(K);
             
-            int submax = *std::max_element(part.begin(),part.end());
-            
             std::unordered_set<int> seen;
             
             size_t i = 0;
@@ -166,7 +164,7 @@ namespace EBS
                 
                 label++;
                 
-                for(int t = i; t < K; t++)
+                for(size_t t = i; t < K; t++)
                 {
                     if(seen.find(t) == seen.end())
                     {

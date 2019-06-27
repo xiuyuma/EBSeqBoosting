@@ -63,7 +63,7 @@ RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP iter, SEXP alpha, 
     NumericVector bta(beta);
     
     const int ng = scExpM.rows();
-    const int nc = scEXPM.cols();
+    const int nc = scExpM.cols();
     
     EBS::COUNTS data(ng,nc);
     
@@ -101,8 +101,8 @@ RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP iter, SEXP alpha, 
     // convert to R acceptable object
     Eigen::MatrixXi mDep(DEP.size(),DEP[0].size());
     
-    for (size_t ri = 0; ri < res.nrow(); ri++)
-        for(size_t ci = 0; ci < res.ncol(); ci++)
+    for (size_t ri = 0; ri < mDep.rows(); ri++)
+        for(size_t ci = 0; ci < mDep.cols(); ci++)
             mDep(ri,ci) = DEP[ri][ci];
     
     return Rcpp::List::create(Named("DEpattern") = mDep, Named("Posterior") = POSP, Named("Alpha") = X.getALP(), Named("Beta") = X.getBETA());

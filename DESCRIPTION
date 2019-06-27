@@ -1,0 +1,16 @@
+Package: EBSeqBoost
+Type: Package
+Title: Identifying differential distributed genes for single cell RNA data
+Version: 2.0
+Date: 2019-06-27
+Author: Xiuyu Ma
+Maintainer: Xiuyu Ma
+     <watsonforfun@gmail.com>
+Description: scaled up empirical bayesian scheme for identifying DE patterns for scRNA seq data
+License: GPL (>= 2)
+Imports: Rcpp (>= 0.12.11), RcppEigen (>= 0.3.2.9.0), EBSeq, Oscope, BiocParallel, mclust, doParallel
+Depends: EBSeq, Oscope, BiocParallel, mclust, doParallel
+LinkingTo: Rcpp, RcppEigen
+SystemRequirements: c++11
+Roxygen: list(wrap=FALSE)
+RoxygenNote: 6.0.1

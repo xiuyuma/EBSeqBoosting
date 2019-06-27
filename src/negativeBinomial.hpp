@@ -56,7 +56,7 @@ namespace EBS
         }
         
         
-        void init(Float alpha, Eigen::VectorXd beta, std::vector<Float> lrate, int UC, Float thre, Float filter)
+        void init(Float alpha, Eigen::VectorXd beta, std::vector<Float> lrate, int UC, Float thre, Float sthre, Float filter)
         {
             // uncertatinty should be smaller than number of subtypes - 1 (number of in/equalities)
             assert(UC < _sum.cols());
@@ -76,6 +76,7 @@ namespace EBS
             // threshold for distinguish certain and uncertain
             _threshold = thre;
             
+            _shrinkthre = sthre;
             // filter threshold for low expression subtypes
             _filter = filter;
             
@@ -348,7 +349,7 @@ namespace EBS
                         newClusOr[iter] = newClus[ord2[iter]];
                     }
                     
-                    auto newClusOrd = partition::reorder(newClusOr);
+                    std::vector<int> newClusOrd = partition::reorder(newClusOr);
                     
                     auto sClus = partition::toString<std::vector<int>>(newClusOrd);
                     
@@ -367,7 +368,47 @@ namespace EBS
             
         }
         
-        
+        void shrinkage()
+        {
+            std::vector<std::vector<int>> newDep;
+            
+            std::vector<COUNTS> newPat;
+            
+            
+            for(size_t i = 0; i < _dep.size(); i++)
+            {
+                if(_p(i) > _shrinkthre)
+                {
+                    newDep.push_back(_dep[i]);
+                    
+                    newPat.push_back(_pat[i]);
+                }
+            }
+            
+            Eigen::VectorXd newP;
+            
+            newP.resize(newDep.size());
+            
+            size_t start = 0;
+            
+            for(size_t i = 0; i < _dep.size(); i++)
+            {
+                if(_p(i) > _shrinkthre)
+                {
+                    newP(start) = _p(i);
+                    
+                    start++;
+                }
+            }
+            
+            newP = newP / newP.sum();
+            
+            std::swap(_dep,newDep);
+            
+            std::swap(_pat,newPat);
+            
+            _p = newP;
+        }
         
         Float kernel2case(Float& s1, Float& s2, Float& r1, Float& r2, int n1, int n2, size_t i)
         {
@@ -546,6 +587,9 @@ namespace EBS
         
         // positve threshold to decide how many uncertain patterns
         Float _threshold;
+        
+        // positive threshold for iterative shrinkage size of de patterns
+        Float _shrinkthre;
         
         // gene level uncertainty
         std::vector<size_t> _guc;

@@ -63,6 +63,10 @@ namespace EBS
                     
                     std::cout << "OBJ " << lastOBJ << "\n";
                     
+                    shrinkage();
+                    
+                    std::cout << "size " << DEPsize() << "\n";
+                    
                     continue;
                 }
                 
@@ -73,6 +77,10 @@ namespace EBS
                 lastOBJ = getOBJ();
                 
                 std::cout << "OBJ " << lastOBJ << "\n";
+                
+                shrinkage();
+                
+                std::cout << "size " << DEPsize() << "\n";
                 
                 Iter++;
             }
@@ -96,8 +104,15 @@ namespace EBS
         // M - step of EM
         virtual void Mstep() = 0;
         
+        // shrinkage
+        virtual void shrinkage() = 0;
+        
         // get value of objective function
         virtual Float getOBJ() = 0;
+        
+        // get number of DE patterns
+        virtual size_t DEPsize() = 0;
+        
         
         
     protected:

@@ -16,7 +16,7 @@
 #' @return a list containing considered DE patterns and their posterior probability, values for alpha and beta
 #' @export
 
-EBS <- function(data,conditions,uc,
+EBSeqBoost <- function(data,conditions,uc,
 iter = 50,alpha = 0.4, beta = 0, step1 = 1e-6,step2 = 0.01,
 thre = log(2), sthre = 0.001, filter = 10, stopthre = 1e-3) {
     

@@ -11,7 +11,7 @@ The algorithm can be summaried in the following:
 
 2) Take the union of each gene specific neighbour of patterns as the pool of patterns to be considered in the EBSeq scheme, using EM algorithm to find out hyper parameters and marginal density of each patterns
 
-3) Remove patterns with small marginal densities, repeat step 2 until convergence of EM.
+3) Remove patterns with small marginal densities, repeat step 2 until convergence of the EM algorithm.
 
 
 p.s.

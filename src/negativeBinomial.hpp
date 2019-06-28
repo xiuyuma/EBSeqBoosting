@@ -76,7 +76,9 @@ namespace EBS
             // threshold for distinguish certain and uncertain
             _threshold = thre;
             
+            // threshold for shrinkage
             _shrinkthre = sthre;
+            
             // filter threshold for low expression subtypes
             _filter = filter;
             
@@ -559,7 +561,7 @@ namespace EBS
         
         
     private:
-        
+        // get type of row in eigen matrix
         typedef decltype(_mean.row(0)) ROW;
         
         // hyper parameter r can be estimated by MM
@@ -574,6 +576,7 @@ namespace EBS
         // size of each cluster, vector of dim K by 1, used for product of r.
         COUNTS _csize;
         
+        // step size for update hyper parameters
         std::vector<Float> _lrate;
         
         // prop of each nonzero pattern

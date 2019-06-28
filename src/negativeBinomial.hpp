@@ -18,6 +18,7 @@ namespace EBS
         
         NB(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster) : EBSeq(scRNAexpMatrix, cellCluster)
         {
+            // method of moments to estimate size factor r of NB
             COUNTS _var = aggregate::groupVar(scRNAexpMatrix, _clusinfo);
             
             COUNTS var;
@@ -45,6 +46,7 @@ namespace EBS
             
             _r = (mn.cwiseProduct(q)).array() / (I - q).array();
             
+            // record cluster size
             auto tmp = _clusinfo.size;
             
             _csize.resize(1,tmp.size());

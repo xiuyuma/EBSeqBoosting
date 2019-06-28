@@ -1,4 +1,4 @@
-## Pruning scheme for empirical bayes
+## iterative pruning for empirical bayes
 
 ## Application to large scRNA data (millions of cells)
 

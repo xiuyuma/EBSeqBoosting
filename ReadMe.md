@@ -2,7 +2,7 @@
 
 ### Speed up EBSeq (http://bioconductor.org/packages/release/bioc/html/EBSeq.html) under comparision of more groups
 
-EBSeq uses an empirical bayes method to handle means comparison of multiple groups. It struggled when the number of groups(K) become big, specifically, the time and space complexity of the algorithm increased exponentially with K. 
+EBSeq uses an Empirical Bayes method to handle means comparison of multiple groups. It struggled when the number of groups(K) become big, specifically, the time and space complexity of the algorithm increased exponentially with K. 
 
 We developed an iterative information sharing scheme to efficiently pruning the space of differential mean(DM) patterns and select those patterns with higher marginal densities. 
 

@@ -11,12 +11,12 @@ The algorithm can be summaried in the following:
 
 2) Take the union of each gene specific neighbour(patterns) as the pool of patterns to be considered in the EBSeq, which using EM algorithm to find out hyper parameters and marginal density of each patterns
 
-3) Remove patterns with very small marginal densities, repeat step 2 until convergence of the EM algorithm.
+3) Remove patterns with small marginal densities, repeat step 2 until convergence of the EM algorithm.
 
 
 Note: 
 
 For step 1, we use an approximation to solve it, which greatly reduce the time complexity of searching.
 
-It may be helpful using tbb for parallel computing at the first pruning. However the benefits of speeding up is very limited and requiring tbb on server would create more overhead. We are looking for a light-weight and less-dependent package.
+It may be helpful using tbb for parallel computing at the first pruning. However the benefits of speeding up is limited and requiring tbb on server would create more overhead. We are looking for a light-weight and less-dependent package.
 

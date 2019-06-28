@@ -1,4 +1,4 @@
-# Iterative pruning for empirical bayes
+# Iterative pruning for Empirical Bayes
 
 ### Speed up EBSeq (http://bioconductor.org/packages/release/bioc/html/EBSeq.html) under comparision of more groups
 

@@ -14,6 +14,9 @@ The algorithm can be summaried in the following:
 3) Remove patterns with small marginal densities, repeat step 2 until convergence of the EM algorithm.
 
 
-p.s.
+note: 
+
+For step 1, we use an approximation to solve it, which greatly reduce the time complexity of searching.
+
 It may be helpful using tbb for parallel computing at the first pruning. However the benefits of speeding up is very limited and asking for tbb dependency on server would create more overhead.
 

@@ -18,5 +18,5 @@ Note:
 
 For step 1, we use an approximation to solve it, which greatly reduce the time complexity of searching.
 
-It may be helpful using tbb for parallel computing at the first pruning. However the benefits of speeding up is limited and requiring tbb on server would create more overhead. We are looking for a light-weight and less-dependent package.
+It may be helpful using tbb for parallel computing at the first pruning. However the increase of speeding is limited and requiring tbb on server would create more overhead. We are looking for a light-weight and less-dependent package.
 

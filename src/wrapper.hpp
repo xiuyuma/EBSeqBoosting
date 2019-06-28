@@ -7,7 +7,7 @@
 
 namespace EBS
 {
-    
+    // wrapper function for nlopt (found to be worse than EM)
     Float wrapperFunc(const std::vector<Float> &param, std::vector<Float> &grad, void *object)
     {
         Eigen::VectorXd p(param.size());

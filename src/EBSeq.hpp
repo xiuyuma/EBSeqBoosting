@@ -49,12 +49,14 @@ namespace EBS
             
             while(Iter < max_iteration && changeRatio > changeThre)
             {
-                Estep();
-                
-                Mstep();
                 
                 if(first)
                 {
+                    
+                    Estep();
+                    
+                    Mstep();
+                    
                     lastOBJ = getOBJ();
                     
                     Iter++;
@@ -63,12 +65,16 @@ namespace EBS
                     
                     std::cout << "OBJ " << lastOBJ << "\n";
                     
-                    shrinkage();
-                    
                     std::cout << "size " << DEPsize() << "\n";
                     
                     continue;
                 }
+                
+                shrinkage();
+                
+                Estep();
+                
+                Mstep();
                 
                 changeRatio = (getOBJ() - lastOBJ) / lastOBJ;
                 

@@ -84,8 +84,6 @@ namespace EBS
                 
                 std::cout << "OBJ " << lastOBJ << "\n";
                 
-                shrinkage();
-                
                 std::cout << "size " << DEPsize() << "\n";
                 
                 Iter++;

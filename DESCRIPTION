@@ -8,7 +8,7 @@ Maintainer: Xiuyu Ma
      <watsonforfun@gmail.com>
 Description: scaled up empirical bayesian scheme for identifying DE patterns for scRNA seq data
 License: GPL (>= 2)
-Imports: Rcpp (>= 0.12.11), RcppEigen (>= 0.3.2.9.0), EBSeq, Oscope, BiocParallel, mclust, doParallel
+Imports: Rcpp (>= 0.12.11), RcppEigen (>= 0.3.2.9.0)
 Depends: 
 LinkingTo: Rcpp, RcppEigen
 SystemRequirements: c++11

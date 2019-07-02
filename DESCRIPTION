@@ -1,4 +1,4 @@
-Package: EBSeqBoost
+Package: EBSeqTest
 Type: Package
 Title: Identifying differential distributed genes for single cell RNA data
 Version: 1.0

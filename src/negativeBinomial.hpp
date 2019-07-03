@@ -31,7 +31,7 @@ namespace EBS
             
             I.fill(1);
             
-            mn = scRNAexpMatrix.rowwise().mean();
+            mn = _mean.rowwise().mean();
             
             for(size_t i = 0; i < G; i++){
                 

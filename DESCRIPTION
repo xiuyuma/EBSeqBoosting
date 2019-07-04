@@ -13,4 +13,4 @@ Depends:
 LinkingTo: Rcpp, RcppEigen,BH
 SystemRequirements: c++11
 Roxygen: list(wrap=FALSE)
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1

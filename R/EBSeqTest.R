@@ -36,7 +36,7 @@ thre = log(2), sthre = 0.001, filter = 10, stopthre = 1e-3) {
     {
         beta = rep(2,nrow(data))
     }
-    if(sizefactor == 1)
+    if(length(sizefactor) == 1 && sizefactor == 1)
     {
         sizefactor = rep(1,ncol(data))
     }

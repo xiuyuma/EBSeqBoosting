@@ -16,10 +16,10 @@ namespace EBS
     public:
         
         
-        NB(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster) : EBSeq(scRNAexpMatrix, cellCluster)
+        NB(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster, std::vector<Float>& sizeFactor) : EBSeq(scRNAexpMatrix, cellCluster, sizeFactor)
         {
             // method of moments to estimate size factor r of NB
-            COUNTS _var = aggregate::groupVar(scRNAexpMatrix, _clusinfo);
+            COUNTS _var = aggregate::groupVar(scRNAexpMatrix, _mean, _clusinfo, sizeFactor);
             
             COUNTS var;
             
@@ -56,7 +56,6 @@ namespace EBS
                 _csize(0,i) = tmp[i];
             }
         }
-        
         
         void init(Float alpha, Eigen::VectorXd beta, std::vector<Float> lrate, int UC, Float thre, Float sthre, Float filter)
         {

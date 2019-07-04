@@ -13,13 +13,13 @@ namespace EBS
         
     public:
          
-        EBSeq(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster)
+        EBSeq(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster, std::vector<Float>& sizeFactor)
         {
             _clusinfo = helper::clusInfo(cellCluster);
             
-            _sum = aggregate::sum(scRNAexpMatrix, _clusinfo);
+            _sum = aggregate::sum(scRNAexpMatrix, _clusinfo, sizeFactor);
             
-            _mean = aggregate::groupMean(scRNAexpMatrix, _clusinfo);
+            _mean = aggregate::groupMean(_sum, _clusinfo);
         }
         
         

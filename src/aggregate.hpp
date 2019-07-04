@@ -33,20 +33,37 @@ struct aggregate
         return res;
     }
     
-    static COUNTS groupMean(COUNTS& counts, CLUSINFO& clusInfo)
+    static COUNTS sum(COUNTS& counts, CLUSINFO& clusInfo, std::vector<Float>& sizeFactor)
     {
         size_t K = clusInfo.size.size();
-
-        COUNTS _sum = sum(counts, clusInfo);
+        
+        COUNTS res(counts.rows(),K);
+        
+        res.fill(0);
+        
+        for(auto i = 0; i < K; i++)
+        {
+            for(auto s:clusInfo.index[i])
+            {
+                res.col(i) += counts.col(s) / sizeFactor[s];
+            }
+        }
+        
+        return res;
+    }
+    
+    static COUNTS groupMean(COUNTS SUM, CLUSINFO& clusInfo)
+    {
+        size_t K = clusInfo.size.size();
         
         for(auto i = 0; i < K; i++)
         {
             size_t _size = clusInfo.index[i].size();
-
-            _sum.col(i) /= _size;
+            
+            SUM.col(i) /= _size;
         }
-
-        return _sum;
+        
+        return SUM;
     }
     
     template <typename VAL>
@@ -55,11 +72,30 @@ struct aggregate
         return x * x;
     }
     
-    static COUNTS groupVar(COUNTS& counts, CLUSINFO& clusInfo)
+    static COUNTS groupVar(COUNTS& counts, COUNTS& MEAN, CLUSINFO& clusInfo)
     {
         size_t K = clusInfo.size.size();
-
-        COUNTS _mean = groupMean(counts, clusInfo);
+        
+        COUNTS res(counts.rows(),K);
+        
+        res.fill(0);
+        
+        for(int i = 0; i < K; i++)
+        {
+            for(auto s:clusInfo.index[i])
+            {
+                res.col(i) += (counts.col(s) - MEAN.col(i)).unaryExpr(&square<Float>);
+            }
+            
+            res.col(i) /= clusInfo.index[i].size();
+        }
+        
+        return res;
+    }
+    
+    static COUNTS groupVar(COUNTS& counts, COUNTS& MEAN, CLUSINFO& clusInfo, std::vector<Float>& sizeFactor)
+    {
+        size_t K = clusInfo.size.size();
 
         COUNTS res(counts.rows(),K);
         
@@ -69,7 +105,7 @@ struct aggregate
         {
             for(auto s:clusInfo.index[i])
             {
-                res.col(i) += (counts.col(s) - _mean.col(i)).unaryExpr(&square<Float>);
+                res.col(i) += (counts.col(s) - MEAN.col(i) * sizeFactor[s]).unaryExpr(&square<Float>) / sizeFactor[s];
             }
 
             res.col(i) /= clusInfo.index[i].size();

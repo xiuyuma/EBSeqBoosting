@@ -16,12 +16,13 @@ using namespace Rcpp;
 using namespace Eigen;
 using namespace std;
 
-Rcpp::List EBSeq(Rcpp::NumericMatrix scExpMatrix, Rcpp::IntegerVector groupLabel, int iter, double alpha, Rcpp::NumericVector beta, double step1, double step2, int uc, double thre, double sthre, double filter, double stopthre);
+Rcpp::List EBSeq(Rcpp::NumericMatrix scExpMatrix, Rcpp::IntegerVector groupLabel, Rcpp::NumericVector sizeFactor, int iter, double alpha, Rcpp::NumericVector beta, double step1, double step2, int uc, double thre, double sthre, double filter, double stopthre);
 
-RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP iter, SEXP alpha, SEXP beta, SEXP step1, SEXP step2, SEXP uc, SEXP thre, SEXP sthre, SEXP filter, SEXP stopthre)
+RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP sizeFactor, SEXP iter, SEXP alpha, SEXP beta, SEXP step1, SEXP step2, SEXP uc, SEXP thre, SEXP sthre, SEXP filter, SEXP stopthre)
 {
     // param scExpMatrix: scRNA seq transcripts matrix (normalized counts required)
     // param groupLabel: group label for each cell
+    // param sizeFactor: normalizing factor for raw counts (for old EBSeq), 1 for normalized counts
     // param iter: number of max iteration in EM
     // param alpha: start point of hyper parameter alpha
     // param beta: start point of hyper parameter beta
@@ -59,31 +60,31 @@ RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP iter, SEXP alpha, 
     
     IntegerVector cluster(groupLabel);
     
+    NumericVector szf(sizeFactor);
+    
     NumericVector bta(beta);
     
     const int ng = scExpM.rows();
     const int nc = scExpM.cols();
     
     EBS::COUNTS data(ng,nc);
-    
     std::copy(scExpM.begin(),scExpM.end(),data.data());
     
     std::vector<int> conditions(nc);
-    
     std::copy(cluster.begin(),cluster.end(),conditions.begin());
     
-    Eigen::VectorXd bt(ng);
+    std::vector<EBS::Float> sf(nc);
+    std::copy(szf.begin(),szf.end(),sf.begin());
     
+    Eigen::VectorXd bt(ng);
     std::copy(bta.begin(),bta.end(),bt.data());
     
     std::vector<EBS::Float> lrate;
-    
     lrate.push_back(stepsizeAlp);
-    
     lrate.push_back(stepsizeBt);
     
     // create and initialize NB class object
-    EBS::NB X = EBS::NB(data,conditions);
+    EBS::NB X = EBS::NB(data,conditions,sf);
     
     X.init(alp, bt, lrate, UC, threshold, sthreshold, filterThre);
     

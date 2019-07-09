@@ -59,29 +59,15 @@ namespace EBS
                 }
                 
                 _rsum = _r * csize;
-                
-                std::cout << "size r sum " << _rsum.rows() << " " << _rsum.cols() << "\n";
             }
             else
             {
                 // a large matrix
                 COUNTS _r = ((mn.cwiseProduct(q)).array() / (I - q).array()).matrix() * sizeFactor.transpose();
                 
-                std::cout << "size r " << _r.rows() << " " << _r.cols() << "\n";
-                
                 _rsum = aggregate::sum(_r, _clusinfo);
             }
             
-            
-            // record cluster size
-//            auto tmp = _clusinfo.size;
-//
-//            _csize.resize(1,tmp.size());
-//
-//            for(size_t i = 0; i < tmp.size(); i++)
-//            {
-//                _csize(0,i) = tmp[i];
-//            }
         }
         
         void init(Float alpha, Eigen::VectorXd beta, std::vector<int> iLabel, std::vector<Float> lrate, int UC, Float thre, Float sthre, Float filter)
@@ -306,9 +292,8 @@ namespace EBS
                     
                     int n2 = _clusinfo.size[o2];
                     
-                    //Float r1 = n1 * _r(i);
                     Float r1 = _rsum(i,o1);
-                    //Float r2 = n2 * _r(i);
+                    
                     Float r2 = _rsum(i,o2);
                     
                     // ratio of EE and DE prior predictive functions
@@ -491,7 +476,6 @@ namespace EBS
             {
                 COUNTS _csum = _sum * _pat[i];
                 
-                //COUNTS _rsum = _r * _csize * _pat[i];
                 COUNTS rsum = _rsum * _pat[i];
                 
                 COUNTS A = (rsum.array() + _alpha).matrix();
@@ -523,8 +507,7 @@ namespace EBS
             for(size_t i = 0; i < npat; i++)
             {
                 COUNTS _csum = _sum * _pat[i];
-
-                //COUNTS _rsum = _r * _csize * _pat[i];
+                
                 COUNTS rsum = _rsum * _pat[i];
 
                 COUNTS A = (rsum.array() + _alpha).matrix();
@@ -664,9 +647,6 @@ namespace EBS
         
         // position for each label
         std::vector<std::vector<int> > _isoPos;
-        
-        // size of each cluster, vector of dim K by 1, used for product of r.
-//        COUNTS _csize;
         
         // step size for update hyper parameters
         std::vector<Float> _lrate;

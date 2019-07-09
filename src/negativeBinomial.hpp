@@ -380,7 +380,7 @@ namespace EBS
                     
                     auto sClus = partition::toString<std::vector<int>>(newClusOrd);
                     
-                    if(dep.find(sClus) == dep.end())
+                    if(dep.count(sClus) < 1)
                     {
                         dep.insert(sClus);
                         

@@ -10,7 +10,7 @@ Description: scaled up empirical bayesian scheme for identifying DE patterns for
 License: GPL (>= 2)
 Imports: Rcpp (>= 0.12.11), RcppEigen (>= 0.3.2.9.0)
 Depends: 
-LinkingTo: Rcpp, RcppEigen,BH
+LinkingTo: Rcpp,RcppEigen,BH
 SystemRequirements: c++11
 Roxygen: list(wrap=FALSE)
 RoxygenNote: 6.1.1

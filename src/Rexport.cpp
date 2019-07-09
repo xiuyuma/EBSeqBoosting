@@ -18,7 +18,7 @@ using namespace std;
 
 Rcpp::List EBSeq(Rcpp::NumericMatrix scExpMatrix, Rcpp::IntegerVector groupLabel, Rcpp::IntegerVector isoLabel, Rcpp::NumericVector sizeFactor, int iter, double alpha, Rcpp::NumericVector beta, double step1, double step2, int uc, double thre, double sthre, double filter, double stopthre);
 
-RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEX isoLabel, SEXP sizeFactor, SEXP iter, SEXP alpha, SEXP beta, SEXP step1, SEXP step2, SEXP uc, SEXP thre, SEXP sthre, SEXP filter, SEXP stopthre)
+RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP isoLabel, SEXP sizeFactor, SEXP iter, SEXP alpha, SEXP beta, SEXP step1, SEXP step2, SEXP uc, SEXP thre, SEXP sthre, SEXP filter, SEXP stopthre)
 {
     // param scExpMatrix: scRNA seq transcripts matrix (normalized counts required)
     // param groupLabel: group label for each cell

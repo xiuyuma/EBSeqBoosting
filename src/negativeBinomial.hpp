@@ -520,28 +520,35 @@ namespace EBS
 
             auto tmp1 = _alpha + _lrate[0] * (alpDRV * _p).sum();
             
-            auto bt = betaDRV * _p
-            
             //auto tmp2 = _beta + _lrate[1] * (betaDRV.array() * _post.array()).matrix().rowwise().sum();
-            if(_ng < _sum.rows())
+            
+            Eigen::VectorXd tmp2;
+            
+            if(_ng < G)
             {
+                // has to make extra copy
+                Eigen::VectorXd bt = betaDRV * _p;
+                
                 for(size_t localIter = 0; localIter < _ng; localIter++)
                 {
                     Float localGrad = 0;
                     
-                    for(auto localPos:_isoPos[localiter])
+                    for(auto localPos:_isoPos[localIter])
                     {
-                        localGrad += bt[localPos];
+                        localGrad += bt(localPos);
                     }
                     
-                    for(auto localPos:_isoPos[localiter])
+                    for(auto localPos:_isoPos[localIter])
                     {
-                        bt[localPos] = localGrad;
+                        bt(localPos) = localGrad;
                     }
                 }
+                
+                tmp2 = _beta + _lrate[1] * bt;
+            }else
+            {
+                tmp2 = _beta + _lrate[1] * (betaDRV * _p);
             }
-            
-            tmp2 = _beta + _lrate[1] * bt;
             
             
             // check validity
@@ -550,9 +557,9 @@ namespace EBS
 
             for(size_t i = 0; i < G; i++)
             {
-                if(tmp2[i] > 0)
+                if(tmp2(i) > 0)
                 {
-                    _beta[i] = tmp2[i];
+                    _beta(i) = tmp2(i);
                 }
             }
         }

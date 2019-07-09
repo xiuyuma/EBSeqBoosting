@@ -16,7 +16,7 @@
 #' @return a list containing considered DE patterns and their posterior probability, values for alpha and beta
 #' @export
 
-EBSeqTest <- function(data,conditions,uc, sizefactor = 1,
+EBSeqTest <- function(data,conditions,uc, iLabel = 1,sizefactor = 1,
 iter = 50,alpha = 0.4, beta = 0, step1 = 1e-6,step2 = 0.01,
 thre = log(2), sthre = 0.001, filter = 10, stopthre = 1e-3) {
     
@@ -36,6 +36,14 @@ thre = log(2), sthre = 0.001, filter = 10, stopthre = 1e-3) {
     {
         beta = rep(2,nrow(data))
     }
+    if(length(iLabel) == 1 && iLabel == 1)
+    {
+        iLabel = 1:nrow(data)
+    }
+    if(length(iLabel) != nrow(data))
+    {
+        stop("incorrect length of isoform label")
+    }
     if(length(sizefactor) == 1 && sizefactor == 1)
     {
         sizefactor = rep(1,ncol(data))
@@ -45,9 +53,12 @@ thre = log(2), sthre = 0.001, filter = 10, stopthre = 1e-3) {
         stop("incorrect length of size factor")
     }
     
+    
+    
     .Call('EBSeq',
     scExpMatrix = data,
     groupLabel = conditions,
+    iLabel = iLabel,
     sizeFactor = sizefactor,
     iter = iter,
     alpha = alpha,

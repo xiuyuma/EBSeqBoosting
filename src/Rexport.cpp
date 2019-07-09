@@ -16,9 +16,9 @@ using namespace Rcpp;
 using namespace Eigen;
 using namespace std;
 
-Rcpp::List EBSeq(Rcpp::NumericMatrix scExpMatrix, Rcpp::IntegerVector groupLabel, Rcpp::NumericVector sizeFactor, int iter, double alpha, Rcpp::NumericVector beta, double step1, double step2, int uc, double thre, double sthre, double filter, double stopthre);
+Rcpp::List EBSeq(Rcpp::NumericMatrix scExpMatrix, Rcpp::IntegerVector groupLabel, Rcpp::IntegerVector isoLabel, Rcpp::NumericVector sizeFactor, int iter, double alpha, Rcpp::NumericVector beta, double step1, double step2, int uc, double thre, double sthre, double filter, double stopthre);
 
-RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP sizeFactor, SEXP iter, SEXP alpha, SEXP beta, SEXP step1, SEXP step2, SEXP uc, SEXP thre, SEXP sthre, SEXP filter, SEXP stopthre)
+RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEX isoLabel, SEXP sizeFactor, SEXP iter, SEXP alpha, SEXP beta, SEXP step1, SEXP step2, SEXP uc, SEXP thre, SEXP sthre, SEXP filter, SEXP stopthre)
 {
     // param scExpMatrix: scRNA seq transcripts matrix (normalized counts required)
     // param groupLabel: group label for each cell
@@ -60,6 +60,8 @@ RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP sizeFactor, SEXP i
     
     IntegerVector cluster(groupLabel);
     
+    IntegerVector iL(isoLabel);
+    
     NumericVector szf(sizeFactor);
     
     NumericVector bta(beta);
@@ -72,6 +74,9 @@ RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP sizeFactor, SEXP i
     
     std::vector<int> conditions(nc);
     std::copy(cluster.begin(),cluster.end(),conditions.begin());
+    
+    std::vector<int> iLabel(ng);
+    std::copy(iL.begin(),iL.end(),iLabel.begin());
     
     std::vector<EBS::Float> sf(nc);
     std::copy(szf.begin(),szf.end(),sf.begin());
@@ -86,7 +91,7 @@ RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP sizeFactor, SEXP i
     // create and initialize NB class object
     EBS::NB X = EBS::NB(data,conditions,sf);
     
-    X.init(alp, bt, lrate, UC, threshold, sthreshold, filterThre);
+    X.init(alp, bt, iLabel, lrate, UC, threshold, sthreshold, filterThre);
     
     // EM
     X.EM(itr, stopThre);

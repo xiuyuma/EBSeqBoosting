@@ -57,7 +57,7 @@ namespace EBS
             }
         }
         
-        void init(Float alpha, Eigen::VectorXd beta, std::vector<Float> lrate, int UC, Float thre, Float sthre, Float filter)
+        void init(Float alpha, Eigen::VectorXd beta, std::vector<int> iLabel, std::vector<Float> lrate, int UC, Float thre, Float sthre, Float filter)
         {
             // uncertatinty should be smaller than number of subtypes - 1 (number of in/equalities)
             assert(UC < _sum.cols());
@@ -67,6 +67,30 @@ namespace EBS
             
             // vector of beta for beta prior, gene specific
             _beta = beta;
+            
+            // label for isoform.
+            _isoLabel = iLabel;
+            
+            _ng = *(std::max_element(iLabel.begin(),iLabel.end()));
+            
+            // only when there is nontrivial isoform label, then init isoPos
+            if(_ng < _sum.rows())
+            {
+                for(size_t lab = 1; lab < _ng + 1; lab++)
+                {
+                    std::vector<int> tmpPos;
+                    
+                    for(size_t pos = 0; pos < _isoLabel.size(); pos++)
+                    {
+                        if(_isoLabel[pos] == lab)
+                        {
+                            tmpPos.push_back(pos);
+                        }
+                    }
+                    
+                    _isoPos.push_back(tmpPos);
+                }
+            }
             
             // stepsize of gradient updates for alpha and beta
             _lrate = lrate;
@@ -496,8 +520,29 @@ namespace EBS
 
             auto tmp1 = _alpha + _lrate[0] * (alpDRV * _p).sum();
             
-            auto tmp2 = _beta + _lrate[1] * (betaDRV * _p);
+            auto bt = betaDRV * _p
+            
             //auto tmp2 = _beta + _lrate[1] * (betaDRV.array() * _post.array()).matrix().rowwise().sum();
+            if(_ng < _sum.rows())
+            {
+                for(size_t localIter = 0; localIter < _ng; localIter++)
+                {
+                    Float localGrad = 0;
+                    
+                    for(auto localPos:_isoPos[localiter])
+                    {
+                        localGrad += bt[localPos];
+                    }
+                    
+                    for(auto localPos:_isoPos[localiter])
+                    {
+                        bt[localPos] = localGrad;
+                    }
+                }
+            }
+            
+            tmp2 = _beta + _lrate[1] * bt;
+            
             
             // check validity
             if(tmp1 > 0)
@@ -573,6 +618,15 @@ namespace EBS
         
         // beta for the beta prior specified by each gene, estimated by EM
         Eigen::VectorXd _beta;
+        
+        // label for isoform.
+        std::vector<int> _isoLabel;
+        
+        // number of isoforms
+        size_t _ng;
+        
+        // position for each label
+        std::vector<std::vector<int> > _isoPos;
         
         // size of each cluster, vector of dim K by 1, used for product of r.
         COUNTS _csize;

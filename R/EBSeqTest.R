@@ -4,6 +4,7 @@
 #' @param data single cell expression matrix, row as genes column as cells (normalized counts required)
 #' @param conditions partition of cells
 #' @param uc number of unceratin relations between means of subtypes for each gene level
+#' @param iLabel label for isoform, indicating which beta are shared
 #' @param iter maximum iteration step of EM
 #' @param alpha start point of hyper parameter alpha
 #' @param beta start point of hyper parameter beta

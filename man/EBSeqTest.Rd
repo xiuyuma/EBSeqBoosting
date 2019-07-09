@@ -4,8 +4,8 @@
 \alias{EBSeqTest}
 \title{iterative pruning empirical bayesian}
 \usage{
-EBSeqTest(data, conditions, uc, sizefactor = 1, iter = 50,
-  alpha = 0.4, beta = 0, step1 = 1e-06, step2 = 0.01,
+EBSeqTest(data, conditions, uc, iLabel = 1, sizefactor = 1,
+  iter = 50, alpha = 0.4, beta = 0, step1 = 1e-06, step2 = 0.01,
   thre = log(2), sthre = 0.001, filter = 10, stopthre = 0.001)
 }
 \arguments{
@@ -14,6 +14,8 @@ EBSeqTest(data, conditions, uc, sizefactor = 1, iter = 50,
 \item{conditions}{partition of cells}
 
 \item{uc}{number of unceratin relations between means of subtypes for each gene level}
+
+\item{iLabel}{label for isoform, indicating which beta are shared}
 
 \item{iter}{maximum iteration step of EM}
 

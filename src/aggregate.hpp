@@ -33,7 +33,7 @@ struct aggregate
         return res;
     }
     
-    static COUNTS sum(COUNTS& counts, CLUSINFO& clusInfo, std::vector<Float>& sizeFactor)
+    static COUNTS sum(COUNTS& counts, CLUSINFO& clusInfo, Eigen::VectorXd& sizeFactor)
     {
         size_t K = clusInfo.size.size();
         
@@ -45,7 +45,7 @@ struct aggregate
         {
             for(auto s:clusInfo.index[i])
             {
-                res.col(i) += counts.col(s) / sizeFactor[s];
+                res.col(i) += counts.col(s) / sizeFactor(s);
             }
         }
         
@@ -93,7 +93,7 @@ struct aggregate
         return res;
     }
     
-    static COUNTS groupVar(COUNTS& counts, COUNTS& MEAN, CLUSINFO& clusInfo, std::vector<Float>& sizeFactor)
+    static COUNTS groupVar(COUNTS& counts, COUNTS& MEAN, CLUSINFO& clusInfo, Eigen::VectorXd& sizeFactor)
     {
         size_t K = clusInfo.size.size();
 
@@ -105,7 +105,7 @@ struct aggregate
         {
             for(auto s:clusInfo.index[i])
             {
-                res.col(i) += (counts.col(s) - MEAN.col(i) * sizeFactor[s]).unaryExpr(&square<Float>) / sizeFactor[s];
+                res.col(i) += (counts.col(s) - MEAN.col(i) * sizeFactor(s)).unaryExpr(&square<Float>) / sizeFactor(s);
             }
 
             res.col(i) /= clusInfo.index[i].size();

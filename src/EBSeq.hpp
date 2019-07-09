@@ -13,7 +13,7 @@ namespace EBS
         
     public:
          
-        EBSeq(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster, std::vector<Float>& sizeFactor)
+        EBSeq(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster, Eigen::VectorXd& sizeFactor)
         {
             _clusinfo = helper::clusInfo(cellCluster);
             

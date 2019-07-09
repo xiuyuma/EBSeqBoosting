@@ -16,7 +16,7 @@ namespace EBS
     public:
         
         
-        NB(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster, std::vector<Float>& sizeFactor) : EBSeq(scRNAexpMatrix, cellCluster, sizeFactor)
+        NB(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster, Eigen::VectorXd& sizeFactor) : EBSeq(scRNAexpMatrix, cellCluster, sizeFactor)
         {
             // method of moments to estimate size factor r of NB
             COUNTS _var = aggregate::groupVar(scRNAexpMatrix, _mean, _clusinfo, sizeFactor);
@@ -43,18 +43,45 @@ namespace EBS
                 else
                     q(i,0) = mn(i,0) / var(i,0);
             }
+            if(sizeFactor.maxCoeff() - sizeFactor.minCoeff() < 0.0001)
+            {
+                // a vector
+                COUNTS _r = (mn.cwiseProduct(q)).array() / (I - q).array();
+                
+                // record cluster size
+                auto tmp = _clusinfo.size;
+                
+                COUNTS csize(1,tmp.size());
+                
+                for(size_t i = 0; i < tmp.size(); i++)
+                {
+                    csize(0,i) = tmp[i];
+                }
+                
+                _rsum = _r * csize;
+                
+                std::cout << "size r sum " << _rsum.rows() << " " << _rsum.cols() << "\n";
+            }
+            else
+            {
+                // a large matrix
+                COUNTS _r = ((mn.cwiseProduct(q)).array() / (I - q).array()).matrix() * sizeFactor.transpose();
+                
+                std::cout << "size r " << _r.rows() << " " << _r.cols() << "\n";
+                
+                _rsum = aggregate::sum(_r, _clusinfo);
+            }
             
-            _r = (mn.cwiseProduct(q)).array() / (I - q).array();
             
             // record cluster size
-            auto tmp = _clusinfo.size;
-            
-            _csize.resize(1,tmp.size());
-            
-            for(size_t i = 0; i < tmp.size(); i++)
-            {
-                _csize(0,i) = tmp[i];
-            }
+//            auto tmp = _clusinfo.size;
+//
+//            _csize.resize(1,tmp.size());
+//
+//            for(size_t i = 0; i < tmp.size(); i++)
+//            {
+//                _csize(0,i) = tmp[i];
+//            }
         }
         
         void init(Float alpha, Eigen::VectorXd beta, std::vector<int> iLabel, std::vector<Float> lrate, int UC, Float thre, Float sthre, Float filter)
@@ -279,9 +306,10 @@ namespace EBS
                     
                     int n2 = _clusinfo.size[o2];
                     
-                    Float r1 = n1 * _r(i);
-                    
-                    Float r2 = n2 * _r(i);
+                    //Float r1 = n1 * _r(i);
+                    Float r1 = _rsum(i,o1);
+                    //Float r2 = n2 * _r(i);
+                    Float r2 = _rsum(i,o2);
                     
                     // ratio of EE and DE prior predictive functions
 //                    Float use, marginal;
@@ -463,9 +491,10 @@ namespace EBS
             {
                 COUNTS _csum = _sum * _pat[i];
                 
-                COUNTS _rsum = _r * _csize * _pat[i];
+                //COUNTS _rsum = _r * _csize * _pat[i];
+                COUNTS rsum = _rsum * _pat[i];
                 
-                COUNTS A = (_rsum.array() + _alpha).matrix();
+                COUNTS A = (rsum.array() + _alpha).matrix();
                 
                 COUNTS B = _csum.colwise() + _beta;
                 
@@ -495,9 +524,10 @@ namespace EBS
             {
                 COUNTS _csum = _sum * _pat[i];
 
-                COUNTS _rsum = _r * _csize * _pat[i];
+                //COUNTS _rsum = _r * _csize * _pat[i];
+                COUNTS rsum = _rsum * _pat[i];
 
-                COUNTS A = (_rsum.array() + _alpha).matrix();
+                COUNTS A = (rsum.array() + _alpha).matrix();
 
                 COUNTS B = _csum.colwise() + _beta;
 
@@ -618,7 +648,7 @@ namespace EBS
         typedef decltype(_mean.row(0)) ROW;
         
         // hyper parameter r can be estimated by MM
-        COUNTS _r;
+        COUNTS _rsum;
         
         // alpha for the beta prior shared by genome, estimated by EM
         Float _alpha;
@@ -636,7 +666,7 @@ namespace EBS
         std::vector<std::vector<int> > _isoPos;
         
         // size of each cluster, vector of dim K by 1, used for product of r.
-        COUNTS _csize;
+//        COUNTS _csize;
         
         // step size for update hyper parameters
         std::vector<Float> _lrate;

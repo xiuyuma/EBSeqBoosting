@@ -78,8 +78,8 @@ RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP isoLabel, SEXP siz
     std::vector<int> iLabel(ng);
     std::copy(iL.begin(),iL.end(),iLabel.begin());
     
-    std::vector<EBS::Float> sf(nc);
-    std::copy(szf.begin(),szf.end(),sf.begin());
+    Eigen::VectorXd sf(nc);
+    std::copy(szf.begin(),szf.end(),sf.data());
     
     Eigen::VectorXd bt(ng);
     std::copy(bta.begin(),bta.end(),bt.data());

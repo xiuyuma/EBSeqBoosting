@@ -13,6 +13,24 @@ namespace EBS
 
 struct aggregate
 {
+    static COUNTS sum(Eigen::VectorXd& vec, CLUSINFO& clusInfo)
+    {
+        size_t K = clusInfo.size.size();
+        
+        COUNTS res(1,vec.size());
+        
+        res.fill(0);
+        
+        for(auto i = 0; i < K; i++)
+        {
+            for(auto s:clusInfo.index[i])
+            {
+                res(0,i) += vec(s);
+            }
+        }
+        
+        return res;
+    }
     
     static COUNTS sum(COUNTS& counts, CLUSINFO& clusInfo)
     {

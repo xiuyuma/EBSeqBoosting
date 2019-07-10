@@ -43,31 +43,11 @@ namespace EBS
                 else
                     q(i,0) = mn(i,0) / var(i,0);
             }
-            if(sizeFactor.maxCoeff() - sizeFactor.minCoeff() < 0.0001)
-            {
-                // a vector
-                COUNTS _r = (mn.cwiseProduct(q)).array() / (I - q).array();
-                
-                // record cluster size
-                auto tmp = _clusinfo.size;
-                
-                COUNTS csize(1,tmp.size());
-                
-                for(size_t i = 0; i < tmp.size(); i++)
-                {
-                    csize(0,i) = tmp[i];
-                }
-                
-                _rsum = _r * csize;
-            }
-            else
-            {
-                // a large matrix
-                COUNTS _r = ((mn.cwiseProduct(q)).array() / (I - q).array()).matrix() * sizeFactor.transpose();
-                
-                _rsum = aggregate::sum(_r, _clusinfo);
-            }
             
+            // aggregate sum of size factor
+            auto ssum = aggregate::sum(sizeFactor, _clusinfo);
+            
+            _rsum = ((mn.cwiseProduct(q)).array() / (I - q).array()).matrix() * ssum;
         }
         
         void init(Float alpha, Eigen::VectorXd beta, std::vector<int> iLabel, std::vector<Float> lrate, int UC, Float thre, Float sthre, Float filter)

@@ -230,7 +230,7 @@ namespace EBS
         {
             // update alpha and beta
             gradientAscent();
-            
+
             // update p
             updateP();
         }
@@ -457,7 +457,7 @@ namespace EBS
                 COUNTS _csum = _sum * _pat[i];
                 
                 COUNTS rsum = _rsum * _pat[i];
-                
+    
                 COUNTS A = (rsum.array() + _alpha).matrix();
                 
                 COUNTS B = _csum.colwise() + _beta;
@@ -467,7 +467,7 @@ namespace EBS
                 res = (res.array() - boost::math::lgamma(_alpha)).matrix();
                 
                 res =  res.colwise() - (_beta.unaryExpr<Float(*)(Float)>(&boost::math::lgamma) + (_alpha + _beta.array()).matrix().unaryExpr<Float(*)(Float)>(&boost::math::lgamma));
-                
+    
                 _kernel.col(i) = res.rowwise().sum();
                 
             }
@@ -564,17 +564,18 @@ namespace EBS
             Eigen::VectorXd M = _kernel.rowwise().maxCoeff();
             
             auto rmMax = _kernel.colwise() - M;
-            
+
             _post = rmMax.unaryExpr<Float(*)(Float)>(& exp);
             
             Eigen::VectorXd total = _post * _p;
-            
+        
             total = (1 / total.array()).matrix();
-            
+           
             //outer product of total and p
             COUNTS div = total * _p.transpose();
             
             _post = (_post.array() * div.array()).matrix();
+            
         }
         
         void updateP()

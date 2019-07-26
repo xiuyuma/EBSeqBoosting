@@ -4,6 +4,7 @@
 #include <assert.h>
 #include "partition.hpp"
 #include "helper.hpp"
+#include <Rcpp.h>
 
 namespace EBS
 {
@@ -63,9 +64,9 @@ namespace EBS
                     
                     first = false;
                     
-                    std::cout << "OBJ " << lastOBJ << "\n";
+                    Rcpp::Rcout << "Objective = " << lastOBJ << "\n";
                     
-                    std::cout << "size " << DEPsize() << "\n";
+                    Rcpp::Rcout << "Number of DE patterns = " <<  DEPsize() << "\n";
                     
                     continue;
                 }
@@ -82,9 +83,9 @@ namespace EBS
                 
                 lastOBJ = getOBJ();
                 
-                std::cout << "OBJ " << lastOBJ << "\n";
+                Rcpp::Rcout << "Objective = " << lastOBJ << "\n";
                 
-                std::cout << "size " << DEPsize() << "\n";
+                Rcpp::Rcout << "Number of DE patterns = " <<  DEPsize() << "\n";
                 
                 Iter++;
             }

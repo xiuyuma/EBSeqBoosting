@@ -17,7 +17,7 @@ struct aggregate
     {
         size_t K = clusInfo.size.size();
         
-        COUNTS res(1,vec.size());
+        COUNTS res(1,K);
         
         res.fill(0);
         

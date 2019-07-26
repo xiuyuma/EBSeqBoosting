@@ -22,6 +22,7 @@ RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP isoLabel, SEXP siz
 {
     // param scExpMatrix: scRNA seq transcripts matrix (normalized counts required)
     // param groupLabel: group label for each cell
+    // param isoLabel: for isoform case need to share beta within same isoform label
     // param sizeFactor: normalizing factor for raw counts (for old EBSeq), 1 for normalized counts
     // param iter: number of max iteration in EM
     // param alpha: start point of hyper parameter alpha

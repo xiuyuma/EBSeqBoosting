@@ -388,6 +388,50 @@ namespace EBS
             
         }
         
+        
+        void equalHandle(std::vector<bool>& baseBit, std::vector<double>& logRatio, int gene)
+        {
+            // corner case when lots of contiguous subtypes having big bayes factor supporting
+            // equal expression while the head and tail be quite different
+            int start = 0;
+            int pos = 0;
+            int K = baseBit.size() + 1;
+            int counter = 0;
+            
+            while(pos < baseBit.size())
+            {
+                //equality and greater than threshold
+                if(baseBit[pos] < 1 && abslogRatio[pos] > _threshold)
+                {
+                    pos++;
+                    counter++;
+                }
+                else
+                {
+                    if(counter > 2)
+                    {
+                        // hclust
+                        equalHandleHelper(std::vector<bool>& baseBit, std::vector<double>& logRatio, int gene, int start, int pos - 1);
+                    }
+                    
+                    // reset
+                    pos++;
+                    start = pos;
+                    counter = 0;
+                }
+            }
+        }
+        
+        void equalHandleHelper(std::vector<bool>& baseBit, std::vector<double>& logRatio, int gene, int start, int end)
+        {
+            // agglomerative hclust to modify baseBit
+            auto minPos = std::max_element(logRatio.begin() + start,logRatio.end() + end) - logRatio.begin() - start;
+            
+            
+            
+        }
+        
+        
         void shrinkage()
         {
             std::vector<std::vector<int>> newDep;

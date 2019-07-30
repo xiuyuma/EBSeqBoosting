@@ -410,8 +410,10 @@ namespace EBS
                 {
                     if(counter > 2)
                     {
+                    	cs = _sum.row(gene);
+                    	rs = _rsum.row(gene);
                         // hclust
-                        equalHandleHelper(std::vector<bool>& baseBit, std::vector<double>& logRatio, int gene, int start, int pos - 1);
+                    	ALGO::hclust(cs,rs,baseBit,logRatio,start,pos-1);
                     }
                     
                     // reset
@@ -422,14 +424,7 @@ namespace EBS
             }
         }
         
-        void equalHandleHelper(std::vector<bool>& baseBit, std::vector<double>& logRatio, int gene, int start, int end)
-        {
-            // agglomerative hclust to modify baseBit
-            auto minPos = std::max_element(logRatio.begin() + start,logRatio.end() + end) - logRatio.begin() - start;
-            
-            
-            
-        }
+       
         
         
         void shrinkage()

@@ -413,7 +413,7 @@ namespace EBS
                     	cs = _sum.row(gene);
                     	rs = _rsum.row(gene);
                         // hclust
-                    	ALGO::hclust(cs,rs,baseBit,logRatio,start,pos-1);
+                    	ALGO::hclust(cs,rs,baseBit,logRatio,start,pos-1,_alpha,_beta(gene));
                     }
                     
                     // reset

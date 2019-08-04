@@ -43,9 +43,9 @@ namespace EBS
             return res;
         }
         
-        Node* createNodeList(ROW& csum, ROW& rsum,std::vector<Float>& logRatio, int start, int end)
+        Node* createNodeList(ROW& csum, ROW& rsum,std::vector<Float>& logRatio, int start, int end, std::vector<int>& sizes)
         {
-            Node* head = createNode(csum,rsum,logRatio,start);
+            Node* head = createNode(csum,rsum,logRatio,start,sizes[0]);
             Node* prev = head;
             for(int i = start + 1; i < end + 1; i++)
             {
@@ -60,10 +60,41 @@ namespace EBS
     	
     	template<typename ROW>
         static void hclust(ROW& csum, ROW& rsum, std::vector<bool>& baseBit, 
-        		std::vector<Float>& logRatio, int start, int end, Float alpha, Float beta)
+                           std::vector<Float>& logRatio, int start, int end, Float alpha, Float beta, Float thre1, Float thre2, std::vector<int>& sizes)
 		{
             std::list<Node> clus;
+            auto head = createNodeList(csum,rsum,logRatio,start,end,sizes);
             
+            int counter = end - start + 1;
+            
+            Float minDist = -INT_MAX;
+            
+            auto minDistNode = nullptr;
+            
+            while(counter > 0)
+            {
+                auto tmpNode = head;
+                for(size_t i = 0; i < counter - 1; i++)
+                {
+                    if(tmpNode->distToNext > minDist)
+                    {
+                        minDist = max(minDist,tmpNode->distToNext);
+                        minDistNode = tmpNode;
+                    }
+                    
+                    tmpNode = tmpNode->next;
+                }
+                
+                if(minDist > thre1 && minDistNode != nullptr)
+                {
+                    merge(minDistNode,minDistNode->next);
+                    counter--;
+                }
+                if(minDist < thre1)
+                {
+                    break;
+                }
+            }
             
 		}
         

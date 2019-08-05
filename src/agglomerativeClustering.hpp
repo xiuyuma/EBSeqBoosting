@@ -1,18 +1,20 @@
 #pragma once
 
+#include "float.hpp"
 #include <Eigen/Dense>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include "Float.hpp"
 #include <list>
+#include <boost/math/special_functions/gamma.hpp>
 
 namespace EBS
 {
     
     class ALGO
     {
+    public:
     	struct Node
 		{
     		Float rs;
@@ -20,11 +22,11 @@ namespace EBS
             Float distToNext;
             int sz;
     		std::vector<int> indexSet;
-            Node* prev,next;
+            Node *prev, *next;
 		};
         
         template<typename ROW>
-        Node* createNode(ROW& csum, ROW& rsum,std::vector<Float>& logRatio, int pos, int size)
+        static Node* createNode(ROW& csum, ROW& rsum,std::vector<Float>& logRatio, int pos, int size)
         {
             Node* res = new Node();
             
@@ -43,13 +45,14 @@ namespace EBS
             return res;
         }
         
-        Node* createNodeList(ROW& csum, ROW& rsum,std::vector<Float>& logRatio, int start, int end, std::vector<int>& sizes)
+        template<typename ROW>
+        static Node* createNodeList(ROW& csum, ROW& rsum,std::vector<Float>& logRatio, int start, int end, std::vector<int>& sizes)
         {
-            Node* head = createNode(csum,rsum,logRatio,start,sizes[0]);
+            Node* head = createNode<ROW>(csum,rsum,logRatio,start,sizes[0]);
             Node* prev = head;
             for(int i = start + 1; i < end + 1; i++)
             {
-                Node* tmp = createNode(csum,rsum,logRatio,i);
+                Node* tmp = createNode<ROW>(csum,rsum,logRatio,i,sizes[i - start]);
                 prev->next = tmp;
                 tmp->prev = prev;
                 prev = tmp;
@@ -63,13 +66,13 @@ namespace EBS
                            std::vector<Float>& logRatio, int start, int end, Float alpha, Float beta, Float thre1, Float thre2, std::vector<int>& sizes)
 		{
             std::list<Node> clus;
-            auto head = createNodeList(csum,rsum,logRatio,start,end,sizes);
+            auto head = createNodeList<ROW>(csum,rsum,logRatio,start,end,sizes);
             
             int counter = end - start + 1;
             
             Float minDist = -INT_MAX;
             
-            auto minDistNode = nullptr;
+            Node* minDistNode = nullptr;
             
             while(counter > 0)
             {
@@ -78,7 +81,7 @@ namespace EBS
                 {
                     if(tmpNode->distToNext > minDist)
                     {
-                        minDist = max(minDist,tmpNode->distToNext);
+                        minDist = tmpNode->distToNext;
                         minDistNode = tmpNode;
                     }
                     
@@ -87,7 +90,7 @@ namespace EBS
                 
                 if(minDist > thre1 && minDistNode != nullptr)
                 {
-                    merge(minDistNode,minDistNode->next);
+                    merge(minDistNode,alpha,beta,thre2);
                     counter--;
                 }
                 if(minDist < thre1)
@@ -95,11 +98,23 @@ namespace EBS
                     break;
                 }
             }
+            if(counter = 0)
+            {
+                return;
+            }
             
+            Node * tmpNode = head->next;
+            
+            while(tmpNode != nullptr)
+            {
+                baseBit[tmpNode->indexSet[0] - 1] = 1;
+                tmpNode = tmpNode->next
+            }
+            return;
 		}
         
         //merge two nodes and delete right node
-        void merge(Node* left, Float alpha, Float beta, Float filter)
+        static void merge(Node* left, Float alpha, Float beta, Float filter)
         {
             auto right = left->next;
             
@@ -124,7 +139,7 @@ namespace EBS
         }
         
         
-        inline Float kernel2(Float& cs1, Float& cs2, Float& rs1, Float& rs2, Float alpha, Float beta, int n1, int n2, Float filter)
+        static inline Float kernel2(Float& cs1, Float& cs2, Float& rs1, Float& rs2, Float alpha, Float beta, int n1, int n2, Float filter)
         {
             // if too small mean, assume they are the same
             if(cs1 / n1 < filter && cs2 / n2 < filter )
@@ -138,5 +153,10 @@ namespace EBS
             return res;
         }
         
-    }
+        static inline Float lbeta(Float x,Float y)
+        {
+            return boost::math::lgamma(x) + boost::math::lgamma(y) - boost::math::lgamma(x + y);
+        }
+        
+    };
 };

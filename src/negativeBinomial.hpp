@@ -2,6 +2,7 @@
 
 
 #include "EBSeq.hpp"
+#include "agglomerativeClustering.hpp"
 #include <cmath>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/digamma.hpp>
@@ -401,7 +402,7 @@ namespace EBS
             while(pos < baseBit.size())
             {
                 //equality and greater than threshold
-                if(baseBit[pos] < 1 && abslogRatio[pos] > _threshold)
+                if(baseBit[pos] < 1 && logRatio[pos] > _threshold)
                 {
                     pos++;
                     counter++;
@@ -410,10 +411,11 @@ namespace EBS
                 {
                     if(counter > 2)
                     {
-                    	cs = _sum.row(gene);
-                    	rs = _rsum.row(gene);
+                    	ROW cs = _sum.row(gene);
+                    	ROW rs = _rsum.row(gene);
                         // hclust
-                    	ALGO::hclust(cs,rs,baseBit,logRatio,start,pos-1,_alpha,_beta(gene));
+                    	ALGO::hclust<ROW>(cs,rs,baseBit,logRatio,start,pos,
+                                     _alpha,_beta(gene),_threshold,_filter,_clusinfo.size);
                     }
                     
                     // reset

@@ -402,7 +402,6 @@ namespace EBS
             // equal expression while the head and tail be quite different
             int start = 0;
             int pos = 0;
-            int K = baseBit.size() + 1;
             int counter = 0;
             
             while(pos < baseBit.size())

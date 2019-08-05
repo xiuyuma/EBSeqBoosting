@@ -68,7 +68,7 @@ namespace EBS
             std::list<Node> clus;
             auto head = createNodeList<ROW>(csum,rsum,logRatio,start,end,sizes);
             
-            int counter = end - start + 1;
+            int counter = end - start;
             
             Float minDist = -INT_MAX;
             
@@ -77,7 +77,7 @@ namespace EBS
             while(counter > 0)
             {
                 auto tmpNode = head;
-                for(size_t i = 0; i < counter - 1; i++)
+                for(size_t i = 0; i < counter; i++)
                 {
                     if(tmpNode->distToNext > minDist)
                     {
@@ -98,7 +98,7 @@ namespace EBS
                     break;
                 }
             }
-            if(counter = 0)
+            if(counter == 0)
             {
                 return;
             }

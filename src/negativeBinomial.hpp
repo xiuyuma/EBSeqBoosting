@@ -311,6 +311,12 @@ namespace EBS
                 
                 auto baseBit = partition::mapToBit(baseClus);
                 
+                Rcpp::Rcout << "baseBit1 " << partition::toString<std::vector<bool>>(baseBit) << "\n";
+                
+                equalHandle(baseBit, abslogRatio, i);
+                
+                Rcpp::Rcout << "baseBit2 " << partition::toString<std::vector<bool>>(baseBit) << "\n";
+                
                 int localUC = 0;
                 
                 while(abslogRatio[localUC] < _threshold)

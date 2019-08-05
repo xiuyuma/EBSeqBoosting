@@ -108,7 +108,7 @@ namespace EBS
             while(tmpNode != nullptr)
             {
                 baseBit[tmpNode->indexSet[0] - 1] = 1;
-                tmpNode = tmpNode->next
+                tmpNode = tmpNode->next;
             }
             return;
 		}

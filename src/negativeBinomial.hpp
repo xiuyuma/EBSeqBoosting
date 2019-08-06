@@ -7,7 +7,7 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <set>
-
+//#include <tbb/tbb.h>
 
 namespace EBS
 {
@@ -236,20 +236,179 @@ namespace EBS
             updateP();
         }
         
+        // only to be called in init genelevel depat
+        
+        typedef Eigen::Block<COUNTS,1> ROW;
+//        std::vector<std::vector<int>> DEpatGene(ROW&& mean, ROW&& cs, ROW&& rs,
+//                                                std::vector<int>& sz, size_t& K,
+//                                                Float& alpha, Float& beta, Float& filter,
+//                                                Float& threshold, int& uncertainty)
+//        {
+//
+//            std::vector<Float> abslogRatio(K - 1);
+//
+//            std::vector<int> baseClus(K);
+//
+//            std::vector<std::vector<int>> res;
+//
+//            auto ord = helper::sortIndexes<ROW>(mean);
+//
+//            auto ord2 = helper::sortIndexes2<ROW>(mean);
+//
+//            baseClus[0] = 1;
+//
+//            for(size_t j = 1; j < K; j++)
+//            {
+//                // position for j-1th and jth subtypes
+//                auto o1 = ord[j - 1];
+//
+//                auto o2 = ord[j];
+//
+//                Float tmp = kernel2case(cs(o1),cs(o2),rs(o1),rs(o2)
+//                                        ,sz[o1],sz[o2],alpha,beta,filter);
+//
+//                abslogRatio[j - 1] = abs(tmp);
+//
+//                //  more favorable for equal mean
+//                if(tmp > 0)
+//                {
+//                    baseClus[j] = baseClus[j - 1];
+//                }
+//                else
+//                {
+//                    // DE start a new cluster
+//                    baseClus[j] = baseClus[j - 1] + 1;
+//                }
+//
+//            }
+//
+//
+//            auto tmpOrd = helper::sortIndexes<std::vector<Float>>(abslogRatio);
+//
+//            auto baseBit = partition::mapToBit(baseClus);
+//
+//
+//
+//            equalHandle(baseBit, abslogRatio, cs, rs,
+//                        alpha, beta, _threshold, _filter, sz);
+//
+//
+//
+//
+//            int localUC = 0;
+//
+//            for(auto score:abslogRatio)
+//            {
+//                if(score < threshold)
+//                {
+//                    localUC++;
+//                }
+//            }
+//
+////            _guc.push_back(localUC);
+//
+//            localUC = (localUC < uncertainty) ? localUC : uncertainty;
+//
+//            if(localUC < 1)
+//            {
+//
+//                auto newClusOr = baseClus;
+//
+//                for(size_t iter = 0; iter < ord2.size(); iter++)
+//                {
+//                    newClusOr[iter] = baseClus[ord2[iter]];
+//                }
+//
+//                auto newClusOrd = partition::reorder(newClusOr);
+//
+//                res.push_back(newClusOrd);
+//
+//                return res;
+//            }
+//
+//            auto pBit = partition::genBit(localUC);
+//
+//            // get promising DE pattern
+//            for(auto x:pBit)
+//            {
+//
+//                auto newBit = baseBit;
+//
+//                for(int t = 0; t < _uncertainty; t++)
+//                {
+//                    auto tmpJ = tmpOrd[t];
+//
+//                    newBit[tmpJ] = x[t];
+//                }
+//
+//                auto newClus = partition::bitToPart(newBit);
+//
+//                auto newClusOr = newClus;
+//
+//                for(size_t iter = 0; iter < ord2.size(); iter++)
+//                {
+//                    newClusOr[iter] = newClus[ord2[iter]];
+//                }
+//
+//                std::vector<int> newClusOrd = partition::reorder(newClusOr);
+//
+////                auto sClus = partition::toString<std::vector<int>>(newClusOrd);
+//
+////                if(dep.count(sClus) < 1)
+////                {
+////                    dep.insert(sClus);
+////
+////                    _dep.push_back(newClusOrd);
+////
+////                    _pat.push_back(partition::toMatrix(newClusOrd));
+////                }
+//
+//                res.push_back(newClusOrd);
+//
+//            }
+//            return res;
+//        }
+        
         // only to be called in init
         void DEpat()
         {
             size_t G = _mean.rows();
             
-            size_t K = _sum.cols();
-            
-            std::vector<Float> abslogRatio(K - 1);
-            
-            std::vector<int> baseClus(K);
+            size_t K = _mean.cols();
             
             // DE patterns to be considered
             std::set<std::string> dep;
             
+//            tbb::parallel_for(blocked_range<size_t>(0,G), DEpatGene());
+//
+//            for(size_t i = 0; i < G; i++)
+//            {
+//
+//                Rcpp::Rcout << "gene " << i << "\n";
+//
+//                auto res = DEpatGene(_mean.row(i), _sum.row(i), _rsum.row(i),
+//                                     _clusinfo.size, K, _alpha, _beta(i),_filter,
+//                                     _threshold,_uncertainty);
+//
+//                for(auto newClusOrd:res)
+//                {
+//                    std::string sClus = partition::toString<std::vector<int>>(newClusOrd);
+//
+//                    if(dep.count(sClus) < 1)
+//                    {
+//                        dep.insert(sClus);
+//
+//                        _dep.push_back(newClusOrd);
+//
+//                        _pat.push_back(partition::toMatrix(newClusOrd));
+//                    }
+//                }
+//            }
+            
+            std::vector<Float> abslogRatio(K - 1);
+            
+            std::vector<int> baseClus(K);
+          
             for(size_t i = 0; i < G; i++)
             {
                 auto ord = helper::sortIndexes<ROW>(_mean.row(i));
@@ -278,18 +437,18 @@ namespace EBS
                     Float r2 = _rsum(i,o2);
                     
                     // ratio of EE and DE prior predictive functions
-//                    Float use, marginal;
-//
-//                    if(o1 < o2)
-//                        use = _mde(o1,o2);
-//                    else
-//                        use = _mde(o2,o1);
+                    //                    Float use, marginal;
+                    //
+                    //                    if(o1 < o2)
+                    //                        use = _mde(o1,o2);
+                    //                    else
+                    //                        use = _mde(o2,o1);
                     
-//                    marginal = use / (1 - use);
+                    //                    marginal = use / (1 - use);
                     
-//                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2,i) + log(marginal);
+                    //                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2,i) + log(marginal);
                     
-                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2,i);
+                    Float tmp = kernel2case(s1,s2,r1,r2,n1,n2,_alpha,_beta(i),_filter);
                     
                     abslogRatio[j - 1] = abs(tmp);
                     
@@ -311,18 +470,31 @@ namespace EBS
                 
                 auto baseBit = partition::mapToBit(baseClus);
                 
-                Rcpp::Rcout << "baseBit1 " << partition::toString<std::vector<bool>>(baseBit) << "\n";
+                auto cs = _sum.row(i);
                 
-                equalHandle(baseBit, abslogRatio, i);
+                auto rs = _rsum.row(i);
                 
-                Rcpp::Rcout << "baseBit2 " << partition::toString<std::vector<bool>>(baseBit) << "\n";
+                auto sz = _clusinfo.size;
+                
+                equalHandle(baseBit, abslogRatio, cs, rs,
+                            _alpha, _beta(i), _threshold, _filter, sz);
+                
+                
                 
                 int localUC = 0;
                 
-                while(abslogRatio[localUC] < _threshold)
+                for(auto score:abslogRatio)
                 {
-                    localUC++;
+                    if(score < _threshold)
+                    {
+                        localUC++;
+                    }
                 }
+                
+                //                while(abslogRatio[localUC] < _threshold)
+                //                {
+                //                    localUC++;
+                //                }
                 
                 _guc.push_back(localUC);
                 
@@ -396,13 +568,16 @@ namespace EBS
         }
         
         
-        void equalHandle(std::vector<bool>& baseBit, std::vector<double>& logRatio, int gene)
+        void equalHandle(std::vector<bool>& baseBit, std::vector<double>& logRatio, ROW& cs, ROW& rs,
+                         Float& alpha, Float& beta, Float& th1, Float& th2, std::vector<int>& sz)
         {
             // corner case when lots of contiguous subtypes having big bayes factor supporting
             // equal expression while the head and tail be quite different
             int start = 0;
             int pos = 0;
             int counter = 0;
+            
+            bool allequal = true;
             
             while(pos < baseBit.size())
             {
@@ -414,13 +589,12 @@ namespace EBS
                 }
                 else
                 {
+                    allequal = false;
                     if(counter > 2)
                     {
-                    	ROW cs = _sum.row(gene);
-                    	ROW rs = _rsum.row(gene);
                         // hclust
-                    	ALGO::hclust<ROW>(cs,rs,baseBit,logRatio,start,pos,
-                                     _alpha,_beta(gene),_threshold,_filter,_clusinfo.size);
+                    	ALGO::hclust<ROW>(cs,rs,logRatio,start,pos,
+                                     alpha,beta,th1,th2,sz);
                     }
                     
                     // reset
@@ -429,6 +603,13 @@ namespace EBS
                     counter = 0;
                 }
             }
+            if(allequal)
+            {
+                ALGO::hclust<ROW>(cs,rs,logRatio,start,pos,
+                                  alpha,beta,th1,th2,sz);
+            }
+            
+            
         }
         
        
@@ -476,17 +657,14 @@ namespace EBS
             _p = newP;
         }
         
-        Float kernel2case(Float& s1, Float& s2, Float& r1, Float& r2, int n1, int n2, size_t i)
+        Float kernel2case(Float& s1, Float& s2, Float& r1, Float& r2,
+                          int& n1, int& n2, Float& alpha, Float& beta, Float& filter)
         {
             // if too small mean, assume they are the same
-            if(s1 / n1 < _filter && s2 / n2 <_filter )
+            if(s1 / n1 < filter && s2 / n2 <filter )
             {
                 return INT_MAX;
             }
-            
-            Float alpha = _alpha;
-            
-            Float beta = _beta(i);
             
             Float res = lbeta(alpha + r1 + r2, beta + s1 + s2) + lbeta(alpha, beta) - lbeta(alpha + r1, beta + s1) - lbeta(alpha + r2, beta + s2);
             
@@ -655,7 +833,7 @@ namespace EBS
         
     private:
         // get type of row in eigen matrix
-        typedef decltype(_mean.row(0)) ROW;
+        //typedef decltype(_mean.row(0)) ROW;
         
         // hyper parameter r can be estimated by MM
         COUNTS _rsum;

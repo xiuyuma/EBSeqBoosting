@@ -6,7 +6,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <list>
 #include <boost/math/special_functions/gamma.hpp>
 
 namespace EBS
@@ -48,11 +47,11 @@ namespace EBS
         template<typename ROW>
         static Node* createNodeList(ROW& csum, ROW& rsum,std::vector<Float>& logRatio, int start, int end, std::vector<int>& sizes)
         {
-            Node* head = createNode<ROW>(csum,rsum,logRatio,start,sizes[0]);
+            Node* head = createNode<ROW>(csum,rsum,logRatio,start,sizes[start]);
             Node* prev = head;
             for(int i = start + 1; i < end + 1; i++)
             {
-                Node* tmp = createNode<ROW>(csum,rsum,logRatio,i,sizes[i - start]);
+                Node* tmp = createNode<ROW>(csum,rsum,logRatio,i,sizes[i]);
                 prev->next = tmp;
                 tmp->prev = prev;
                 prev = tmp;
@@ -62,21 +61,29 @@ namespace EBS
         }
     	
     	template<typename ROW>
-        static void hclust(ROW& csum, ROW& rsum, std::vector<bool>& baseBit, 
+        static void hclust(ROW& csum, ROW& rsum,
                            std::vector<Float>& logRatio, int start, int end, Float alpha, Float beta, Float thre1, Float thre2, std::vector<int>& sizes)
 		{
-            std::list<Node> clus;
+           
+            
             auto head = createNodeList<ROW>(csum,rsum,logRatio,start,end,sizes);
+            
             
             int counter = end - start;
             
-            Float minDist = -INT_MAX;
+            Float minDist;
             
-            Node* minDistNode = nullptr;
+            Node* minDistNode;
             
             while(counter > 0)
             {
-                auto tmpNode = head;
+                
+                Node* tmpNode = head;
+                
+                minDist = -INT_MAX;
+                
+                minDistNode = nullptr;
+                
                 for(size_t i = 0; i < counter; i++)
                 {
                     if(tmpNode->distToNext > minDist)
@@ -88,6 +95,8 @@ namespace EBS
                     tmpNode = tmpNode->next;
                 }
                 
+                
+                
                 if(minDist > thre1 && minDistNode != nullptr)
                 {
                     merge(minDistNode,alpha,beta,thre2);
@@ -98,6 +107,8 @@ namespace EBS
                     break;
                 }
             }
+            
+            
             if(counter == 0)
             {
                 return;
@@ -105,27 +116,51 @@ namespace EBS
             
             Node * tmpNode = head->next;
             
+            
             while(tmpNode != nullptr)
             {
-                baseBit[tmpNode->indexSet[0] - 1] = 1;
+                
+                logRatio[tmpNode->indexSet[0] - 1] = 0;
                 tmpNode = tmpNode->next;
             }
+            
+            
+            
             return;
 		}
         
         //merge two nodes and delete right node
         static void merge(Node* left, Float alpha, Float beta, Float filter)
         {
-            auto right = left->next;
+            Node* right = left->next;
             
             left->rs += right->rs;
             left->cs += right->cs;
             left->sz += right->sz;
             
-            left->distToNext = kernel2(left->cs,right->next->cs,
-                                       left->rs,right->next->rs,
-                                       alpha,beta,left->sz,
-                                       right->next->sz,filter);
+            // update dist to next and to prev
+            if(right->next != nullptr)
+            {
+                left->distToNext = kernel2(left->cs,right->next->cs,
+                                           left->rs,right->next->rs,
+                                           alpha,beta,left->sz,
+                                           right->next->sz,filter);
+                
+                
+            }else
+            {
+                left->distToNext = 0;
+            }
+            
+            if(left->prev != nullptr)
+            {
+                left->prev->distToNext = kernel2(left->prev->cs,left->cs,
+                            left->prev->rs,left->rs,
+                            alpha,beta,left->prev->sz,
+                            left->sz,filter);
+            }
+            
+            
             
             for(auto s:(right->indexSet))
             {
@@ -133,13 +168,16 @@ namespace EBS
             }
             
             left->next = right->next;
+            if(right->next != nullptr)
+            {
+                right->next->prev = left;
+            }
             
             delete right;
-            
         }
         
         
-        static inline Float kernel2(Float& cs1, Float& cs2, Float& rs1, Float& rs2, Float alpha, Float beta, int n1, int n2, Float filter)
+        static inline Float kernel2(Float& cs1, Float& cs2, Float& rs1, Float& rs2, Float& alpha, Float& beta, int& n1, int& n2, Float& filter)
         {
             // if too small mean, assume they are the same
             if(cs1 / n1 < filter && cs2 / n2 < filter )

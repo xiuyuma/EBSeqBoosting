@@ -187,7 +187,7 @@ namespace EBS
             return _q;
         }
         
-        COUNTS getPoolVal()
+        COUNTS getPoolVar()
         {
             return _poolVar;
         }
@@ -243,6 +243,11 @@ namespace EBS
         void setP(Eigen::VectorXd& p)
         {
             _p = p;
+        }
+        
+        Eigen::VectorXd getP()
+        {
+            return _p;
         }
         
     private:

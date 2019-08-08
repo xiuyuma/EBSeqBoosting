@@ -112,6 +112,12 @@ RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP isoLabel, SEXP siz
     // var to be returned
     auto var = X.getVar();
     
+    // pool var
+    auto poolVar = X.getPoolVar();
+    
+    // p
+    auto prop = X.getP();
+    
     // convert to R acceptable object
     Eigen::MatrixXi mDep(DEP.size(),DEP[0].size());
     
@@ -119,7 +125,7 @@ RcppExport SEXP EBSeq(SEXP scExpMatrix, SEXP groupLabel, SEXP isoLabel, SEXP siz
         for(size_t ci = 0; ci < mDep.cols(); ci++)
             mDep(ri,ci) = DEP[ri][ci];
     
-    return Rcpp::List::create(Named("DEpattern") = mDep, Named("Posterior") = POSP, Named("Alpha") = X.getALP(), Named("Beta") = X.getBETA(), Named("q") = QQ, Named("mean") = mm, Named("var") = var);
+    return Rcpp::List::create(Named("DEpattern") = mDep, Named("Posterior") = POSP, Named("Alpha") = X.getALP(), Named("Beta") = X.getBETA(), Named("q") = QQ, Named("mean") = mm, Named("var") = var, Named("poolVar") = poolVar, Named("prop") = prop);
     
     
     
@@ -221,6 +227,9 @@ RcppExport SEXP EBSeqWQ(SEXP scExpMatrix, SEXP groupLabel, SEXP r, SEXP isoLabel
     // DE patterns to be considered
     auto DEP = X.getDEP();
     
+    // p
+    auto prop = X.getP();
+    
     // convert to R acceptable object
     Eigen::MatrixXi mDep(DEP.size(),DEP[0].size());
     
@@ -228,7 +237,7 @@ RcppExport SEXP EBSeqWQ(SEXP scExpMatrix, SEXP groupLabel, SEXP r, SEXP isoLabel
         for(size_t ci = 0; ci < mDep.cols(); ci++)
             mDep(ri,ci) = DEP[ri][ci];
     
-    return Rcpp::List::create(Named("DEpattern") = mDep, Named("Posterior") = POSP, Named("Alpha") = X.getALP(), Named("Beta") = X.getBETA());
+    return Rcpp::List::create(Named("DEpattern") = mDep, Named("Posterior") = POSP, Named("Alpha") = X.getALP(), Named("Beta") = X.getBETA(), Named("prop") = prop);
     
    
     

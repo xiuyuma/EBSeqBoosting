@@ -1,4 +1,5 @@
 useDynLib(EBSeqTest)
+export(EBSeqTest,EBSeqTestWithQ)
 import(RcppEigen)
 importFrom(Rcpp, evalCpp)
 exportPattern("^[[:alpha:]]+")

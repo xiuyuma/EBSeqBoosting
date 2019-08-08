@@ -20,13 +20,11 @@ namespace EBS
         NB(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster, Eigen::VectorXd& sizeFactor) : EBSeq(scRNAexpMatrix, cellCluster, sizeFactor)
         {
             // method of moments to estimate size factor r of NB
-            COUNTS _var = aggregate::groupVar(scRNAexpMatrix, _mean, _clusinfo, sizeFactor);
-            
-            COUNTS var;
+            _var = aggregate::groupVar(scRNAexpMatrix, _mean, _clusinfo, sizeFactor);
             
             size_t G = scRNAexpMatrix.rows();
             
-            var = _var.rowwise().mean();
+            _poolVar = _var.rowwise().mean();
             
             COUNTS q(G,1), I(G,1), mn;
             
@@ -36,19 +34,34 @@ namespace EBS
             
             for(size_t i = 0; i < G; i++){
                 
-                if(abs(var(i,0) - 0) < 0.0001)
-                    var(i,0) = 1;
+                if(abs(_poolVar(i,0) - 0) < 0.0001)
+                    _poolVar(i,0) = 1;
                 
-                if(var(i,0) <= mn(i,0))
+                if(_poolVar(i,0) <= mn(i,0))
                     q(i,0) = 0.99;
                 else
-                    q(i,0) = mn(i,0) / var(i,0);
+                    q(i,0) = mn(i,0) / _poolVar(i,0);
+                
+                for(size_t j = 0; j < _mean.cols(); j++)
+                {
+                    _q(i,j) = _mean(i,j) / _var(i,j);
+                }
             }
             
             // aggregate sum of size factor
             auto ssum = aggregate::sum(sizeFactor, _clusinfo);
             
             _rsum = ((mn.cwiseProduct(q)).array() / (I - q).array()).matrix() * ssum;
+            
+            
+        }
+        
+        NB(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster, Eigen::VectorXd& sizeFactor, Eigen::VectorXd& r) : EBSeq(scRNAexpMatrix, cellCluster, sizeFactor)
+        {
+            // aggregate sum of size factor
+            auto ssum = aggregate::sum(sizeFactor, _clusinfo);
+            
+            _rsum = r * ssum;
         }
         
         void init(Float alpha, Eigen::VectorXd beta, std::vector<int> iLabel, std::vector<Float> lrate, int UC, Float thre, Float sthre, Float filter)
@@ -161,6 +174,22 @@ namespace EBS
         std::vector<std::vector<int>> getDEP()
         {
             return _dep;
+        }
+        
+        
+        COUNTS getVar()
+        {
+            return _var;
+        }
+        
+        COUNTS getQ()
+        {
+            return _q;
+        }
+        
+        COUNTS getPoolVal()
+        {
+            return _poolVar;
         }
         
         std::vector<size_t> getGUC()
@@ -834,6 +863,15 @@ namespace EBS
     private:
         // get type of row in eigen matrix
         //typedef decltype(_mean.row(0)) ROW;
+        
+        //  var per group
+        COUNTS _var;
+        
+        // q per group
+        COUNTS _q;
+        
+        // pool var
+        COUNTS _poolVar;
         
         // hyper parameter r can be estimated by MM
         COUNTS _rsum;

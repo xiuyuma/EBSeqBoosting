@@ -41,12 +41,9 @@ namespace EBS
                     q(i,0) = 0.99;
                 else
                     q(i,0) = mn(i,0) / _poolVar(i,0);
-                
-                for(size_t j = 0; j < _mean.cols(); j++)
-                {
-                    _q(i,j) = _mean(i,j) / _var(i,j);
-                }
             }
+            
+            _q = _mean.array() / _var.array();
             
             // aggregate sum of size factor
             auto ssum = aggregate::sum(sizeFactor, _clusinfo);

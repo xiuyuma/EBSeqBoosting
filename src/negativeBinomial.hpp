@@ -19,36 +19,182 @@ namespace EBS
         
         NB(COUNTS& scRNAexpMatrix, std::vector<int>& cellCluster, Eigen::VectorXd& sizeFactor) : EBSeq(scRNAexpMatrix, cellCluster, sizeFactor)
         {
-            // method of moments to estimate size factor r of NB
-            _var = aggregate::groupVar(scRNAexpMatrix, _mean, _clusinfo, sizeFactor);
+            size_t nk = (_clusinfo.size).size();
             
-            size_t G = scRNAexpMatrix.rows();
-            
-            _poolVar = _var.rowwise().mean();
-            
-            COUNTS q(G,1), I(G,1), mn;
-            
-            I.fill(1);
-            
-            mn = _mean.rowwise().mean();
-            
-            for(size_t i = 0; i < G; i++){
+            if(scRNAexpMatrix.cols() > nk)
+            {
+                // method of moments to estimate size factor r of NB
+                _var = aggregate::groupVar(scRNAexpMatrix, _mean, _clusinfo, sizeFactor);
                 
-                if(abs(_poolVar(i,0) - 0) < 0.0001)
-                    _poolVar(i,0) = 1;
+                size_t G = scRNAexpMatrix.rows();
                 
-                if(_poolVar(i,0) <= mn(i,0))
-                    q(i,0) = 0.99;
-                else
-                    q(i,0) = mn(i,0) / _poolVar(i,0);
+                _poolVar = _var.rowwise().mean();
+                
+                COUNTS q(G,1), I(G,1), mn;
+                
+                I.fill(1);
+                
+                mn = _mean.rowwise().mean();
+                
+                _q.resize(G,_mean.cols());
+                
+                for(size_t i = 0; i < G; i++){
+                    
+                    if(abs(_poolVar(i,0) - 0) < 0.0001)
+                        _poolVar(i,0) = 1;
+                    
+                    if(_poolVar(i,0) <= mn(i,0))
+                        q(i,0) = 0.99;
+                    else
+                        q(i,0) = mn(i,0) / _poolVar(i,0);
+                    
+                    for(size_t j = 0; j < _mean.cols(); j++)
+                    {
+                        _q(i,j) = _mean(i,j) / _var(i,j);
+                    }
+                }
+                
+                // aggregate sum of size factor
+                auto ssum = aggregate::sum(sizeFactor, _clusinfo);
+                
+                _r = ((mn.cwiseProduct(q)).array() / (I - q).array()).matrix();
+                
+                _rsum =  _r * ssum;
+                
+            }else
+            {
+                
+                Eigen::ArrayXd use(_sum.rows());
+                
+                use.fill(1);
+                
+                Eigen::ArrayXd add(_sum.rows());
+                
+                add.fill(0);
+                
+                // case when there is no replicates
+                for(size_t i = 0; i < nk - 1; i++)
+                {
+                    for(size_t j = i + 1; j < nk; j++)
+                    {
+                        Eigen::ArrayXd ratioFilter = (_sum.col(i)).array() / (_sum.col(j)).array();
+                        
+                        std::vector<Float> rmNA;
+                        
+                        for(size_t iter = 0; iter < _sum.rows(); iter++)
+                        {
+                            if(!std::isnan(ratioFilter[iter]))
+                                rmNA.push_back(ratioFilter[iter]);
+                        }
+                        
+                        if(rmNA.empty())
+                        {
+                            continue;
+                        }
+                        
+                        size_t Q1 = rmNA.size() / 4;
+                        size_t Q2 = rmNA.size() * 3 / 4;
+                        
+                        std::nth_element(rmNA.begin(),          rmNA.begin() + Q1, rmNA.end());
+                        
+                        std::nth_element(rmNA.begin() + Q1 + 1,          rmNA.begin() + Q2, rmNA.end());
+                        
+                        Float q25 = rmNA[Q1];
+                        
+                        Float q75 = rmNA[Q2];
+                        
+                        for(size_t iter = 0; iter < _sum.rows(); iter++)
+                        {
+                            if(std::isnan(ratioFilter[iter]) || ratioFilter[iter] < q25 || ratioFilter[iter] > q75)
+                            {
+                                ratioFilter[iter] = 0;
+                            }
+                            else
+                            {
+                                ratioFilter[iter] = 1;
+                            }
+                        }
+                        
+                        use *= ratioFilter;
+                        
+                        add += ratioFilter;
+                    }
+                }
+                
+                
+                if(use.sum() == 0)
+                {
+                    //use top 3 most frequent valid genes
+                    Eigen::ArrayXd::Index maxRow, maxCol;
+                    
+                    auto maxholder = add.maxCoeff(&maxRow, &maxCol);
+                    
+                    use(maxRow,maxCol) = 1;
+                    
+                    add(maxRow,maxCol) = 0;
+                    
+                    maxholder = add.maxCoeff(&maxRow, &maxCol);
+                    
+                    use(maxRow,maxCol) = 1;
+                    
+                    add(maxRow,maxCol) = 0;
+                    
+                    maxholder = add.maxCoeff(&maxRow, &maxCol);
+                    
+                    use(maxRow,maxCol) = 1;
+                }
+                
+                COUNTS dataUse(int(use.sum()),_sum.cols());
+                
+                size_t rowCount = 0;
+                
+                for(size_t useRow = 0; useRow < use.size(); useRow++)
+                {
+                    if(use[useRow]>0)
+                    {
+                        dataUse.row(rowCount) = _sum.row(useRow);
+                        rowCount++;
+                    }
+                }
+                
+                Eigen::VectorXd mean_use = dataUse.rowwise().mean();
+                
+                COUNTS var_use = (dataUse.colwise() - mean_use).rowwise().squaredNorm() / (nk - 1);
+                
+                auto wholeMean = _sum.rowwise().mean().array();
+                
+                auto phi = (var_use - mean_use).array() / (mean_use.array() * mean_use.array());
+                
+                Float rmNEG = 0;
+                int cnn = 0;
+                
+                for(size_t iter = 0; iter < phi.size(); iter++)
+                {
+                    if(phi(iter) >= 0)
+                    {
+                        rmNEG += phi(iter);
+                        cnn++;
+                    }
+                }
+                
+                Float phiUse = rmNEG / cnn;
+                
+                auto varEst = wholeMean * (1 + wholeMean * phiUse);
+                
+                _q = (wholeMean / varEst).matrix();
+                
+                COUNTS I(_sum.rows(),1);
+                
+                I.fill(1);
+                
+                _r = ((wholeMean.matrix().cwiseProduct(_q)).array() / (I - _q).array()).matrix();
+                
+                auto ssum = aggregate::sum(sizeFactor, _clusinfo);
+                
+                _rsum = _r * ssum;
+                
             }
             
-            _q = _mean.array() / _var.array();
-            
-            // aggregate sum of size factor
-            auto ssum = aggregate::sum(sizeFactor, _clusinfo);
-            
-            _rsum = ((mn.cwiseProduct(q)).array() / (I - q).array()).matrix() * ssum;
             
             
         }
@@ -171,6 +317,11 @@ namespace EBS
         std::vector<std::vector<int>> getDEP()
         {
             return _dep;
+        }
+        
+        COUNTS getR()
+        {
+            return _r;
         }
         
         
@@ -876,7 +1027,7 @@ namespace EBS
         COUNTS _poolVar;
         
         // hyper parameter r can be estimated by MM
-        COUNTS _rsum;
+        COUNTS _r,_rsum;
         
         // alpha for the beta prior shared by genome, estimated by EM
         Float _alpha;

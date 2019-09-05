@@ -29,7 +29,7 @@ thre = log(2), sthre = 0.001, filter = 10, stopthre = 1e-3) {
     {
         stop("incorrect length of conditions")
     }
-    if(beta != 0)
+    if(length(beta) > 1)
     {
         if(length(beta) != nrow(data)){stop("incorrect length of hyper parameters")}
     }

@@ -1,16 +1,35 @@
-Package: EBSeqTest
+Package: EBSeq2
 Type: Package
-Title: Identifying differential distributed genes for single cell RNA data
-Version: 1.0
-Date: 2019-06-27
-Author: Xiuyu Ma
-Maintainer: Xiuyu Ma
-     <watsonforfun@gmail.com>
-Description: scaled up empirical bayesian scheme for identifying DE patterns for scRNA seq data
-License: GPL (>= 2)
+Title: An R package for gene and isoform differential expression
+        analysis of RNA-seq data
+Version: 1.24.0
+Date: 2015-12-8
+Author: Ning Leng, Christina Kendziorski, Xiuyu Ma
+Maintainer: Xiuyu Ma <watsonforfun@gmail.com>
+Depends: blockmodeling, gplots, testthat, R (>= 3.0.0)
+Description: Differential Expression analysis at both gene and isoform
+        level using RNA-seq data
+License: Artistic-2.0
+LazyLoad: yes
+Collate: 'MedianNorm.R' 'GetNg.R' 'beta.mom.R' 
+          'EBTest.R'
+        'GetPatterns.R' 'EBMultiTest.R' 'PostFC.R'
+        'GetPPMat.R' 'GetMultiPP.R' 'GetMultiFC.R' 'PlotPostVsRawFC.R'
+        'crit_fun.R' 'DenNHist.R' 'GetNormalizedMat.R' 'PlotPattern.R'
+        'PolyFitPlot.R' 'QQP.R' 'QuantileNorm.R' 'RankNorm.R'
+        'GetDEResults.R' 'EBSeqTest.R' 
+BuildVignettes: no
 Imports: Rcpp (>= 0.12.11), RcppEigen (>= 0.3.2.9.0)
-Depends: 
 LinkingTo: Rcpp,RcppEigen,BH
 SystemRequirements: c++11
 Roxygen: list(wrap=FALSE)
 RoxygenNote: 6.1.1
+biocViews: ImmunoOncology, StatisticalMethod, DifferentialExpression,
+        MultipleComparison, RNASeq, Sequencing
+git_url: https://git.bioconductor.org/packages/EBSeq
+git_branch: RELEASE_3_9
+git_last_commit: f0aec48
+git_last_commit_date: 2019-05-02
+Date/Publication: 2019-05-02
+NeedsCompilation: no
+Packaged: 2019-05-03 00:43:56 UTC; biocbuild
